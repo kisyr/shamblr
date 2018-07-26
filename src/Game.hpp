@@ -1,28 +1,25 @@
 #pragma once
 
 #include "common.hpp"
-#include "components.hpp"
-#include "RenderSystem.hpp"
+#include "Window.hpp"
+#include "City.hpp"
+#include "system/System.hpp"
 
 namespace shamblr {
 
 class Game {
 	public:
-		void configure() {
-			Entity entity = m_registry.create();
-			m_registry.assign<Position>(entity);
-			m_registry.assign<Velocity>(entity);
-			m_registry.assign<Health>(entity, 100, 100);
-			m_registry.assign<Sprite>(entity);
-		}
-
-		void update(const Time& time, const Input& input) {
-			m_render.update(m_registry, time);
-		}
+		Game();
+		void configure();
+		void run();
+		void update(const Time&);
 
 	private:
-		EntityRegistry m_registry;
-		RenderSystem m_render;
+		Window m_window;
+		EntityRegistry m_entities;
+		EventDispatcher m_events;
+		SystemManager m_systems;
+		City m_city;
 };
 
 } // namespace shamblr
