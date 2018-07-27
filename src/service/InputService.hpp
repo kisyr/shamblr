@@ -9,11 +9,15 @@ class InputService {
 	public:
 		InputService(GLFWwindow* window) : m_window(window) {}
 
-		int keyState(int key) {
+		int getKey(int key) const {
 			return glfwGetKey(m_window, key);
 		}
 
-		glm::vec2 cursor() {
+		int getMouseButton(int button) const {
+			return glfwGetMouseButton(m_window, button);
+		}
+
+		glm::vec2 getMouseCursor() const {
 			glm::dvec2 xy;
 			glfwGetCursorPos(m_window, &xy.x, &xy.y);
 			return glm::vec2(xy);

@@ -5,7 +5,16 @@
 struct b2Body;
 struct b2Fixture;
 struct b2FrictionJoint;
-
+#if 0
+struct Weapon {
+	float caliber;
+	float velocity;
+	float rate;
+	float fired;
+	bool triggered;
+	int magazine;
+};
+#endif
 namespace shamblr {
 namespace component {
 
@@ -27,7 +36,9 @@ struct Health {
 
 struct Sprite {};
 
-struct Player {};
+struct Player {
+	std::pair<glm::vec3, glm::vec3> aim;
+};
 
 struct Behaviour {
 	enum class Type {
@@ -44,6 +55,29 @@ struct Sight {
 
 struct Waypoint {
 	glm::vec3 position;
+};
+
+struct Inventory {
+	struct Weapon {
+		enum class Type {
+			HANDGUN,
+		};
+		Type type;
+		bool triggered;
+		float fired;
+	};
+	std::vector<Weapon> weapons;
+};
+
+struct Projectile {
+	glm::vec3 origin;
+	glm::vec3 direction;
+	float velocity;
+};
+
+struct Caliber {
+	float diameter;
+	float length;
 };
 
 } // namespace components

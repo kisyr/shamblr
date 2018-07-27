@@ -1,5 +1,6 @@
 #include "PhysicsSystem.hpp"
 #include "../components.hpp"
+#include "../events.hpp"
 #include <Box2D/Box2D.h>
 
 using namespace shamblr;
@@ -33,7 +34,29 @@ class LineOfSight : public b2RayCastCallback {
 		bool m_sight;
 };
 
-PhysicsSystem::PhysicsSystem(std::vector<Rectangle>& buildings) {
+class RayCastClosest : public b2RayCastCallback {
+	public:
+		RayCastClosest() : m_closest(NULL) {}
+
+		float32 ReportFixture(
+			b2Fixture* fixture,
+			const b2Vec2& point,
+			const b2Vec2& normal,
+			float32 fraction
+		) {
+			m_closest = fixture;
+			return fraction;
+		}
+
+		Entity* hitEntity() const {
+			return m_closest && m_closest->GetUserData() ? static_cast<Entity*>(m_closest->GetUserData()) : NULL;
+		}
+
+	private:
+		b2Fixture* m_closest;
+};
+
+PhysicsSystem::PhysicsSystem(const City& city) {
 	{
 		m_world = new b2World(b2Vec2(0.0f, 0.0f));
 		b2BodyDef groundDef;
@@ -46,7 +69,7 @@ PhysicsSystem::PhysicsSystem(std::vector<Rectangle>& buildings) {
 		bodyDef.position.Set(0.0f, 0.0f);
 		b2Body* body = m_world->CreateBody(&bodyDef);
 
-		for (auto& b : buildings) {
+		for (auto& b : city.lots()) {
 			b2Vec2 vertices[] = {
 				b2Vec2(b.min().x, b.min().y),
 				b2Vec2(b.min().x, b.max().y),
@@ -71,9 +94,14 @@ PhysicsSystem::PhysicsSystem(std::vector<Rectangle>& buildings) {
 
 void PhysicsSystem::configure(EntityRegistry& entities) {
 	entities.construction<component::Physics>().connect<PhysicsSystem, &PhysicsSystem::constructPhysics>(this);
+	entities.destruction<component::Physics>().connect<PhysicsSystem, &PhysicsSystem::destructPhysics>(this);
 }
 
 void PhysicsSystem::process(EntityRegistry& entities, const Time& time) {
+	SHAMBLR_LOG("PhysicsSystem::process\n");
+
+	auto events = locateService<EventDispatcher>();
+
 	// Apply forces to b2d
 	entities.view<component::Physics>().each(
 		[](auto entity, auto& physics) {
@@ -116,6 +144,28 @@ void PhysicsSystem::process(EntityRegistry& entities, const Time& time) {
 			);
 		}
 	);
+
+	// Process projectiles
+	entities.view<component::Projectile>().each(
+		[&world, &entities, &events](const auto entity, auto& projectile) {
+			// Check for closest intersection
+			auto handler = RayCastClosest();
+			auto p0 = projectile.origin;
+			auto p1 = projectile.origin + projectile.direction * 100.0f;
+			world->RayCast(&handler, b2Vec2(p0.x, p0.z), b2Vec2(p1.x, p1.z));
+			if (handler.hitEntity()) {
+				const auto hitEntity = *handler.hitEntity();
+				// Assure entity still exists
+				if (entities.valid(hitEntity)) {
+					if (entities.has<component::Health>(hitEntity)) {
+						events->enqueue<events::ProjectileHit>(hitEntity);
+					}
+				}
+			}
+			// Remove projectile
+			entities.destroy(entity);
+		}
+	);
 }
 
 void PhysicsSystem::constructPhysics(EntityRegistry& entities, Entity entity) {
@@ -132,7 +182,12 @@ void PhysicsSystem::constructPhysics(EntityRegistry& entities, Entity entity) {
 	fixtureDef.shape = &shape;
 	fixtureDef.density = 1.0f;
 	fixtureDef.friction = 1.0f;
+	fixtureDef.userData = new Entity(entity);
 
 	physics.body = m_world->CreateBody(&bodyDef);
 	physics.fixture = physics.body->CreateFixture(&fixtureDef);
+}
+
+void PhysicsSystem::destructPhysics(EntityRegistry& entities, Entity entity) {
+	auto& physics = entities.get<component::Physics>(entity);
 }

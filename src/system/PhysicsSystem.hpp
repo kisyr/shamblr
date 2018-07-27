@@ -10,10 +10,11 @@ namespace shamblr {
 
 class PhysicsSystem : public System {
 	public:
-		PhysicsSystem(std::vector<Rectangle>&);
+		PhysicsSystem(const City&);
 		void configure(EntityRegistry&);
 		void process(EntityRegistry&, const Time&);
 		void constructPhysics(EntityRegistry&, Entity);
+		void destructPhysics(EntityRegistry&, Entity);
 
 	private:
 		b2World* m_world;

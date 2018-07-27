@@ -9,6 +9,8 @@ namespace shamblr {
 class BehaviourSystem : public System {
 	public:
 		void process(EntityRegistry& entities, const Time& time) {
+			SHAMBLR_LOG("BehaviourSystem::process\n");
+
 			// Map behaviour
 			entities.view<component::Behaviour>().each(
 				[this, &entities](const auto entity, auto& behaviour) {
@@ -52,7 +54,7 @@ class BehaviourSystem : public System {
 			if (entities.has<component::Waypoint>(entity)) {
 				const auto& waypoint = entities.get<component::Waypoint>(entity);
 				const auto direction = glm::normalize(waypoint.position - physics.position);
-				physics.velocity = direction * 2.0f;
+				physics.velocity = direction * 1.0f;
 			}
 
 			// Attack target
@@ -60,7 +62,7 @@ class BehaviourSystem : public System {
 				const auto target = players.back();
 				const auto& targetPhysics = entities.get<component::Physics>(target);
 				if (glm::distance(targetPhysics.position, physics.position) < 2.0f) {
-					events->trigger<events::Attack>(entity, target);
+					events->enqueue<events::Attack>(entity, target);
 				}
 			}
 		}

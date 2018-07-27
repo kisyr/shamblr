@@ -10,5 +10,9 @@ struct Attack {
 	Entity target;
 };
 
+struct ProjectileHit {
+	Entity victim;
+};
+
 } // namespace events
 } // namespace shamblr
