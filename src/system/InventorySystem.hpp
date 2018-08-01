@@ -8,8 +8,6 @@ namespace shamblr {
 class InventorySystem : public System {
 	public:
 		void process(EntityRegistry& entities, const Time& time) {
-			SHAMBLR_LOG("InventorySystem::process\n");
-
 			entities.view<component::Inventory, component::Player>().each(
 				[&entities, &time](const auto entity, auto& inventory, auto& player) {
 					if (!inventory.weapons.empty()) {

@@ -28,8 +28,6 @@ void RenderSystem::enter(const Time& time) {
 }
 
 void RenderSystem::process(EntityRegistry& entities, const Time& time) {
-	SHAMBLR_LOG("RenderSystem::process\n");
-
 	auto input = locateService<InputService>();
 	auto camera = locateService<CameraService>();
 	auto& vertices = m_vertices;

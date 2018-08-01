@@ -6,8 +6,6 @@
 using namespace shamblr;
 
 void PlayerSystem::process(EntityRegistry& entities, const Time& time) {
-	SHAMBLR_LOG("PlayerSystem::process\n");
-
 	auto input = locateService<InputService>();
 	auto camera = locateService<CameraService>();
 

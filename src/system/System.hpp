@@ -35,8 +35,6 @@ class SystemManager {
 		}
 
 		void update(EntityRegistry& entities, const Time& time) {
-			SHAMBLR_LOG("System::update\n");
-
 			for (auto& s : m_systems) {
 				s.second->update(entities, time);
 			}

@@ -98,8 +98,6 @@ void PhysicsSystem::configure(EntityRegistry& entities) {
 }
 
 void PhysicsSystem::process(EntityRegistry& entities, const Time& time) {
-	SHAMBLR_LOG("PhysicsSystem::process\n");
-
 	auto events = locateService<EventDispatcher>();
 
 	// Apply forces to b2d

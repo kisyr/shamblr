@@ -9,8 +9,6 @@ namespace shamblr {
 class BehaviourSystem : public System {
 	public:
 		void process(EntityRegistry& entities, const Time& time) {
-			SHAMBLR_LOG("BehaviourSystem::process\n");
-
 			// Map behaviour
 			entities.view<component::Behaviour>().each(
 				[this, &entities](const auto entity, auto& behaviour) {
