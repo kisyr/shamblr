@@ -2,7 +2,7 @@ SOURCES = $(wildcard src/*.cpp) $(wildcard src/system/*.cpp)
 
 build-linux:
 	mkdir build
-	g++ -std=c++14 -o build/shamblr -I./include $(SOURCES) lib/linux/libBox2D.a -lglfw -lGL
+	g++ -std=c++14 -o build/shamblr -Ilib/include $(SOURCES) -lglfw -lBox2D -lGL
 
 build-windows:
 	mkdir build

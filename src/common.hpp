@@ -1,6 +1,7 @@
 #pragma once
 
 #include <array>
+#include <chrono>
 #include <cstdio>
 #include <glm/glm.hpp>
 #include <glm/gtc/quaternion.hpp>
@@ -19,11 +20,6 @@ typedef entt::Dispatcher EventDispatcher;
 struct Time {
 	float elapsed;
 	float delta;
-};
-
-struct Input {
-	std::array<int, 256> keyboard;
-	glm::dvec2 mouse;
 };
 
 template <class T>

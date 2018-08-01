@@ -20,7 +20,7 @@ class InventorySystem : public System {
 								const auto diameter = 9.0f;
 								const auto length = 19.0f;
 								auto bullet = entities.create();
-								entities.assign<component::Projectile>(bullet, origin, direction, velocity);
+								entities.assign<component::Ray>(bullet, origin, direction);
 								entities.assign<component::Caliber>(bullet, diameter, length);
 								weapon.fired = time.elapsed;
 							}

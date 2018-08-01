@@ -29,12 +29,22 @@ struct Physics {
 	b2FrictionJoint* joint;
 };
 
+struct Ray {
+	glm::vec3 origin;
+	glm::vec3 direction;
+};
+
 struct Health {
 	int current;
 	int maximum;
 };
 
 struct Sprite {};
+
+struct Tracer {
+	glm::vec3 begin;
+	glm::vec3 end;
+};
 
 struct Player {
 	std::pair<glm::vec3, glm::vec3> aim;

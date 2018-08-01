@@ -52,7 +52,7 @@ class BehaviourSystem : public System {
 			if (entities.has<component::Waypoint>(entity)) {
 				const auto& waypoint = entities.get<component::Waypoint>(entity);
 				const auto direction = glm::normalize(waypoint.position - physics.position);
-				physics.velocity = direction * 1.0f;
+				physics.velocity = direction * 2.0f;
 			}
 
 			// Attack target

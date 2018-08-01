@@ -32,6 +32,7 @@ void RenderSystem::process(EntityRegistry& entities, const Time& time) {
 	auto camera = locateService<CameraService>();
 	auto& vertices = m_vertices;
 
+	// Draw sprites
 	entities.view<component::Physics, component::Sprite>().each(
 		[&camera, &vertices, &time](auto entity, auto& physics, auto& sprite) {
 			vertices.clear();
@@ -62,10 +63,11 @@ void RenderSystem::process(EntityRegistry& entities, const Time& time) {
 		}
 	);
 
-	entities.view<component::Projectile>().each(
-		[&camera](const auto entity, auto& projectile) {
-			const auto p0 = projectile.origin;
-			const auto p1 = projectile.origin + projectile.direction * 100.0f;
+	// Draw tracers
+	entities.view<component::Tracer>().each(
+		[&camera](const auto entity, auto& tracer) {
+			const auto p0 = tracer.begin;
+			const auto p1 = tracer.end;
 
 			const glm::mat4 projection = camera->projection();
 			const glm::mat4 view = camera->view();
@@ -82,7 +84,9 @@ void RenderSystem::process(EntityRegistry& entities, const Time& time) {
 			glEnd();
 		}
 	);
+	entities.destroy<component::Tracer>();
 
+	// Draw level
 	{
 		const glm::mat4 projection = camera->projection();
 		const glm::mat4 view = camera->view();
@@ -101,12 +105,13 @@ void RenderSystem::process(EntityRegistry& entities, const Time& time) {
 		}
 		glEnd();
 	}
-#if 1
+
+	// Draw player aim
 	entities.view<component::Player>().each(
 		[&camera](const auto entity, auto& player) {
 			const auto& aim = player.aim;
 			const auto origin = aim.first;
-			const auto target = aim.first + aim.second * 10.f;
+			const auto target = aim.first + aim.second * 2.0f;
 
 			const glm::mat4 projection = camera->projection();
 			const glm::mat4 view = camera->view();
@@ -124,34 +129,6 @@ void RenderSystem::process(EntityRegistry& entities, const Time& time) {
 			glEnd();
 		}
 	);
-#endif
-#if 0
-	{
-		const auto screenCursor = input->cursor();
-		const auto worldCursor = camera->unProject(glm::vec3(screenCursor.x, screenCursor.y, 0.0f));
-		const auto center = camera->target();
-		const auto cursor = worldCursor;// * worldCursor.y;
-
-		SHAMBLR_LOG("screen: %s, world: %s, real: %s\n", 
-			glm::to_string(screenCursor).c_str(),
-			glm::to_string(worldCursor).c_str(),
-			glm::to_string(cursor).c_str()
-		);
-
-		const glm::mat4 projection = camera->projection();
-		const glm::mat4 view = camera->view();
-		const glm::mat4 model = glm::translate(glm::mat4(), glm::vec3(0.0f));
-		const glm::mat4 mvp = projection * view * model;
-
-		glMatrixMode(GL_MODELVIEW);
-		glLoadMatrixf(&mvp[0][0]);
-
-		glBegin(GL_LINES);
-		glVertex3f(cursor.x, 0.0f, cursor.z);
-		glVertex3f(center.x, 0.0f, center.z);
-		glEnd();
-	}
-#endif
 }
 
 void RenderSystem::leave(const Time& time) {

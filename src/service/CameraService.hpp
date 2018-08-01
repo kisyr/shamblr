@@ -7,7 +7,7 @@ namespace shamblr {
 
 class CameraService {
 	public:
-		CameraService() : m_distance(100.0f) {}
+		CameraService() : m_distance(50.0f) {}
 
 		void centerOn(const glm::vec3& position) {
 			m_target = position;

@@ -5,10 +5,10 @@
 
 using namespace shamblr;
 
-class LineOfSight : public b2RayCastCallback {
+class RayCastClosest : public b2RayCastCallback {
 	public:
-		LineOfSight(const b2Fixture* origin, const b2Fixture* target) : 
-			m_origin(origin), m_target(target), m_sight(false) {}
+		RayCastClosest(b2Fixture* source = NULL) :
+				m_source(source), m_closestFixture(NULL), m_closestFraction(1.0f) {}
 
 		float32 ReportFixture(
 			b2Fixture* fixture,
@@ -16,44 +16,34 @@ class LineOfSight : public b2RayCastCallback {
 			const b2Vec2& normal,
 			float32 fraction
 		) {
-			m_closest = fixture;
-			if (fixture == m_origin) {
+			m_closestFixture = fixture;
+			m_closestPoint = point;
+			m_closestNormal = normal;
+			m_closestFraction = fraction;
+			if (m_source && m_source == fixture) {
 				return -1.0f;
 			}
 			return fraction;
 		}
 
-		bool hasSight() const {
-			return m_closest == m_target;
+		b2Fixture* hitFixture() const {
+			return m_closestFixture;
+		}
+
+		b2Vec2 hitPoint() const {
+			return m_closestPoint;
+		}
+
+		float32 hitFraction() const {
+			return m_closestFraction;
 		}
 
 	private:
-		const b2Fixture* m_origin;
-		const b2Fixture* m_target;
-		b2Fixture* m_closest;
-		bool m_sight;
-};
-
-class RayCastClosest : public b2RayCastCallback {
-	public:
-		RayCastClosest() : m_closest(NULL) {}
-
-		float32 ReportFixture(
-			b2Fixture* fixture,
-			const b2Vec2& point,
-			const b2Vec2& normal,
-			float32 fraction
-		) {
-			m_closest = fixture;
-			return fraction;
-		}
-
-		Entity* hitEntity() const {
-			return m_closest && m_closest->GetUserData() ? static_cast<Entity*>(m_closest->GetUserData()) : NULL;
-		}
-
-	private:
-		b2Fixture* m_closest;
+		b2Fixture* m_source;
+		b2Fixture* m_closestFixture;
+		b2Vec2 m_closestPoint;
+		b2Vec2 m_closestNormal;
+		float32 m_closestFraction;
 };
 
 PhysicsSystem::PhysicsSystem(const City& city) {
@@ -99,6 +89,7 @@ void PhysicsSystem::configure(EntityRegistry& entities) {
 
 void PhysicsSystem::process(EntityRegistry& entities, const Time& time) {
 	auto events = locateService<EventDispatcher>();
+	auto world = m_world;
 
 	// Apply forces to b2d
 	entities.view<component::Physics>().each(
@@ -121,49 +112,73 @@ void PhysicsSystem::process(EntityRegistry& entities, const Time& time) {
 	);
 
 	// Process sight
-	auto world = m_world;
+#if 1
 	entities.view<component::Physics, component::Sight>().each(
-		[&world, &entities](const auto entityA, auto& physicsA, auto& sightA) {
+		[&world, &entities](const auto entity, auto& physics, auto& sight) {
 			// Reset sights
-			sightA.entities.clear();
+			sight.entities.clear();
 			// Check for line of sight against others
-			entities.view<component::Physics>().each(
-				[world, &entities, &entityA, &physicsA, &sightA](const auto entityB, auto& physicsB) {
-					if (entityA != entityB) {
-						auto los = LineOfSight(physicsA.fixture, physicsB.fixture);
-						auto p0 = b2Vec2(physicsA.position.x, physicsA.position.z);
-						auto p1 = b2Vec2(physicsB.position.x, physicsB.position.z);
-						world->RayCast(&los, p0, p1);
-						if (los.hasSight()) {
-							sightA.entities.push_back(entityB);
+			entities.view<component::Physics, component::Player>().each(
+				[world, &entities, &entity, &physics, &sight](const auto otherEntity, auto& otherPhysics, auto& otherPlayer) {
+					if (entity != otherEntity) {
+						auto handler = RayCastClosest(physics.fixture);
+						auto p0 = b2Vec2(physics.position.x, physics.position.z);
+						auto p1 = b2Vec2(otherPhysics.position.x, otherPhysics.position.z);
+						world->RayCast(&handler, p0, p1);
+						if (handler.hitFixture() && handler.hitFixture()->GetUserData()) {
+							const auto hitEntity = *static_cast<Entity*>(handler.hitFixture()->GetUserData());
+							if (hitEntity == otherEntity) {
+								sight.entities.push_back(hitEntity);
+							}
 						}
 					}
 				}
 			);
 		}
 	);
+#endif
 
-	// Process projectiles
-	entities.view<component::Projectile>().each(
-		[&world, &entities, &events](const auto entity, auto& projectile) {
+	// Process rays
+#if 1
+	entities.view<component::Ray>().each(
+		[&world, &entities, &events](const auto entity, auto& ray) {
 			// Check for closest intersection
 			auto handler = RayCastClosest();
-			auto p0 = projectile.origin;
-			auto p1 = projectile.origin + projectile.direction * 100.0f;
+			const auto length = 100.0f;
+			const auto p0 = ray.origin;
+			const auto p1 = ray.origin + ray.direction * length;
 			world->RayCast(&handler, b2Vec2(p0.x, p0.z), b2Vec2(p1.x, p1.z));
-			if (handler.hitEntity()) {
-				const auto hitEntity = *handler.hitEntity();
-				// Assure entity still exists
-				if (entities.valid(hitEntity)) {
-					if (entities.has<component::Health>(hitEntity)) {
-						events->enqueue<events::ProjectileHit>(hitEntity);
-					}
-				}
+			// Report result
+			auto event = events::RayCast{ray.origin, ray.direction, length * handler.hitFraction()};
+			// TODO: Handle multiple intersections/entities (for example bullet penetration)
+			if (handler.hitFixture() && handler.hitFixture()->GetUserData()) {
+				event.entities.push_back(*static_cast<Entity*>(handler.hitFixture()->GetUserData()));
 			}
-			// Remove projectile
+			events->enqueue<events::RayCast>(event);
+			// Destroy ray
 			entities.destroy(entity);
 		}
 	);
+#endif
+#if 0
+	entities.view<component::Ray>().each(
+		[&world, &entities, &events](const auto entity, auto& ray) {
+			// Check for closest intersection
+			auto handler = RayCastClosest();
+			auto p0 = ray.origin;
+			auto p1 = ray.origin + ray.direction * 100.0f;
+			world->RayCast(&handler, b2Vec2(p0.x, p0.z), b2Vec2(p1.x, p1.z));
+			// Register a hit
+			if (handler.hitFixture() && handler.hitFixture()->GetUserData()) {
+				const auto hitPoint = ray.origin + (ray.direction * 100.0f * handler.hitFraction());
+				const auto hitEntity = *static_cast<Entity*>(handler.hitFixture()->GetUserData());
+				entities.assign<component::CastedRay>(entity, ray.origin, ray.direction, hitPoint, hitEntity);
+			}
+			// Remove ray
+			entities.remove<component::Ray>(entity);
+		}
+	);
+#endif
 }
 
 void PhysicsSystem::constructPhysics(EntityRegistry& entities, Entity entity) {
@@ -188,4 +203,6 @@ void PhysicsSystem::constructPhysics(EntityRegistry& entities, Entity entity) {
 
 void PhysicsSystem::destructPhysics(EntityRegistry& entities, Entity entity) {
 	auto& physics = entities.get<component::Physics>(entity);
+
+	m_world->DestroyBody(physics.body);
 }
