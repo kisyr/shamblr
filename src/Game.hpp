@@ -15,10 +15,10 @@ class Game {
 
 	private:
 		Window m_window;
+		City m_city;
 		std::shared_ptr<EntityRegistry> m_entities;
 		std::shared_ptr<EventDispatcher> m_events;
-		SystemManager m_systems;
-		City m_city;
+		std::shared_ptr<SystemManager> m_systems;
 };
 
 } // namespace shamblr

@@ -22,6 +22,7 @@ Game::Game() : m_window(Window(glm::ivec2(1280, 1024), "Shamblr")) {
 
 	m_entities = std::make_shared<EntityRegistry>();
 	m_events = std::make_shared<EventDispatcher>();
+	m_systems = std::make_shared<SystemManager>();
 
 	configure();
 }
@@ -29,13 +30,13 @@ Game::Game() : m_window(Window(glm::ivec2(1280, 1024), "Shamblr")) {
 void Game::configure() {
 	m_city.generate(glm::vec2(200.0f));
 
-	m_systems.add<RenderSystem>(m_entities, m_events, m_city);
-	m_systems.add<PhysicsSystem>(m_entities, m_events, m_city);
-	m_systems.add<PlayerSystem>(m_entities, m_events);
-	m_systems.add<BehaviourSystem>(m_entities, m_events);
-	m_systems.add<HealthSystem>(m_entities, m_events);
-	m_systems.add<InventorySystem>(m_entities, m_events);
-	m_systems.add<ProjectileSystem>(m_entities, m_events);
+	m_systems->add<RenderSystem>(m_entities, m_events, m_city);
+	m_systems->add<PhysicsSystem>(m_entities, m_events, m_city);
+	m_systems->add<PlayerSystem>(m_entities, m_events);
+	m_systems->add<BehaviourSystem>(m_entities, m_events);
+	m_systems->add<HealthSystem>(m_entities, m_events);
+	m_systems->add<InventorySystem>(m_entities, m_events);
+	m_systems->add<ProjectileSystem>(m_entities, m_events);
 
 	{
 		auto entity = m_entities->create();
@@ -103,7 +104,7 @@ void Game::run() {
 		time.elapsed += delta;
 		time.delta = delta;
 
-		m_systems.update(time);
+		m_systems->update(time);
 		m_events->update();
 
 		m_window.swapBuffers();
