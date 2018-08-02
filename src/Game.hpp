@@ -12,7 +12,6 @@ class Game {
 		Game();
 		void configure();
 		void run();
-		void update(const Time&);
 
 	private:
 		Window m_window;

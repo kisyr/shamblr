@@ -26,34 +26,6 @@ Game::Game() : m_window(Window(glm::ivec2(1280, 1024), "Shamblr")) {
 	configure();
 }
 
-void Game::run() {
-	m_window.makeContextCurrent();
-
-	float seconds = 0.0f;
-	int frames = 0;
-	Time time = {0};
-	while (!m_window.shouldClose()) {
-		const float delta = m_window.getTime();
-		m_window.setTime(0);
-		time.elapsed += delta;
-		time.delta = delta;
-
-		m_systems.update(time);
-		m_events->update();
-
-		m_window.swapBuffers();
-		Window::pollEvents();
-
-		seconds += time.delta;
-		++frames;
-		if (seconds >= 1.0f) {
-			SHAMBLR_LOG("FPS: %g\n", (float)frames / seconds);
-			seconds = 0.0f;
-			frames = 0;
-		}
-	}
-}
-
 void Game::configure() {
 	m_city.generate(glm::vec2(200.0f));
 
@@ -117,4 +89,32 @@ void Game::configure() {
 	}
 	SHAMBLR_LOG("Spawned %d zombies\n", numZombies);
 #endif
+}
+
+void Game::run() {
+	m_window.makeContextCurrent();
+
+	float seconds = 0.0f;
+	int frames = 0;
+	Time time = {0};
+	while (!m_window.shouldClose()) {
+		const float delta = m_window.getTime();
+		m_window.setTime(0);
+		time.elapsed += delta;
+		time.delta = delta;
+
+		m_systems.update(time);
+		m_events->update();
+
+		m_window.swapBuffers();
+		Window::pollEvents();
+
+		seconds += time.delta;
+		++frames;
+		if (seconds >= 1.0f) {
+			SHAMBLR_LOG("FPS: %g\n", (float)frames / seconds);
+			seconds = 0.0f;
+			frames = 0;
+		}
+	}
 }
