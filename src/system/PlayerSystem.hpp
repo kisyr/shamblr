@@ -8,7 +8,7 @@ namespace shamblr {
 
 class PlayerSystem : public System {
 	public:
-		void process(EntityRegistry&, const Time&);
+		void process(const Time&);
 };
 
 } // namespace shamblr

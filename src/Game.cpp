@@ -15,11 +15,13 @@
 using namespace shamblr;
 
 Game::Game() : m_window(Window(glm::ivec2(1280, 1024), "Shamblr")) {
-	auto events = registerService<EventDispatcher>();
 	auto input = registerService<InputService>(m_window.window());
 	auto camera = registerService<CameraService>();
 
 	camera->viewport(glm::ivec4(0, m_window.size().y, m_window.size().x, -m_window.size().y));
+
+	m_entities = std::make_shared<EntityRegistry>();
+	m_events = std::make_shared<EventDispatcher>();
 
 	configure();
 }
@@ -36,10 +38,8 @@ void Game::run() {
 		time.elapsed += delta;
 		time.delta = delta;
 
-		m_systems.update(m_entities, time);
-
-		auto events = locateService<EventDispatcher>();
-		events->update();
+		m_systems.update(time);
+		m_events->update();
 
 		m_window.swapBuffers();
 		Window::pollEvents();
@@ -57,17 +57,17 @@ void Game::run() {
 void Game::configure() {
 	m_city.generate(glm::vec2(200.0f));
 
-	m_systems.add<RenderSystem>(m_entities, m_city);
-	m_systems.add<PhysicsSystem>(m_entities, m_city);
-	m_systems.add<PlayerSystem>(m_entities);
-	m_systems.add<BehaviourSystem>(m_entities);
-	m_systems.add<HealthSystem>(m_entities);
-	m_systems.add<InventorySystem>(m_entities);
-	m_systems.add<ProjectileSystem>(m_entities);
+	m_systems.add<RenderSystem>(m_entities, m_events, m_city);
+	m_systems.add<PhysicsSystem>(m_entities, m_events, m_city);
+	m_systems.add<PlayerSystem>(m_entities, m_events);
+	m_systems.add<BehaviourSystem>(m_entities, m_events);
+	m_systems.add<HealthSystem>(m_entities, m_events);
+	m_systems.add<InventorySystem>(m_entities, m_events);
+	m_systems.add<ProjectileSystem>(m_entities, m_events);
 
 	{
-		auto entity = m_entities.create();
-		m_entities.assign<component::Physics>(entity, 
+		auto entity = m_entities->create();
+		m_entities->assign<component::Physics>(entity, 
 			glm::vec3(),
 			glm::vec3(),
 			glm::quat(),
@@ -76,11 +76,11 @@ void Game::configure() {
 			nullptr,
 			nullptr
 		);
-		m_entities.assign<component::Health>(entity, 100, 100);
-		m_entities.assign<component::Sprite>(entity);
-		m_entities.assign<component::Player>(entity);
-		m_entities.assign<component::Behaviour>(entity, component::Behaviour::Type::PLAYER);
-		auto& inventory = m_entities.assign<component::Inventory>(entity);
+		m_entities->assign<component::Health>(entity, 100, 100);
+		m_entities->assign<component::Sprite>(entity);
+		m_entities->assign<component::Player>(entity);
+		m_entities->assign<component::Behaviour>(entity, component::Behaviour::Type::PLAYER);
+		auto& inventory = m_entities->assign<component::Inventory>(entity);
 		inventory.weapons.push_back({
 			component::Inventory::Weapon::Type::HANDGUN,
 			false,
@@ -96,9 +96,9 @@ void Game::configure() {
 		}
 		for (int n = 0; n < static_cast<int>(r.area() / 10); ++n) {
 			const auto position = glm::linearRand(r.min(), r.max());
-			auto entity = m_entities.create();
+			auto entity = m_entities->create();
 			const glm::vec2 center = r.center();
-			m_entities.assign<component::Physics>(entity, 
+			m_entities->assign<component::Physics>(entity, 
 				glm::vec3(position.x, 0.0f, position.y),
 				glm::vec3(),
 				glm::quat(),
@@ -107,10 +107,10 @@ void Game::configure() {
 				nullptr,
 				nullptr
 			);
-			m_entities.assign<component::Health>(entity, 100, 100);
-			m_entities.assign<component::Sprite>(entity);
-			m_entities.assign<component::Sight>(entity);
-			m_entities.assign<component::Behaviour>(entity, component::Behaviour::Type::ZOMBIE);
+			m_entities->assign<component::Health>(entity, 100, 100);
+			m_entities->assign<component::Sprite>(entity);
+			m_entities->assign<component::Sight>(entity);
+			m_entities->assign<component::Behaviour>(entity, component::Behaviour::Type::ZOMBIE);
 
 			++numZombies;
 		}

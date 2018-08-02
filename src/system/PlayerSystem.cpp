@@ -5,12 +5,12 @@
 
 using namespace shamblr;
 
-void PlayerSystem::process(EntityRegistry& entities, const Time& time) {
+void PlayerSystem::process(const Time& time) {
 	auto input = locateService<InputService>();
 	auto camera = locateService<CameraService>();
 
-	entities.view<component::Player, component::Physics>().each(
-		[&input, &camera, &entities, &time](auto entity, auto& player, auto& physics) {
+	entities()->view<component::Player, component::Physics>().each(
+		[this, &input, &camera, &time](auto entity, auto& player, auto& physics) {
 #if 0
 			const float rotationFactor = 3.0f * time.delta;
 			float rotation = 0.0f;
@@ -44,8 +44,8 @@ void PlayerSystem::process(EntityRegistry& entities, const Time& time) {
 			player.aim = std::make_pair(c0, glm::normalize(c1 - c0));
 
 			// Handle inventory interaction
-			if (entities.has<component::Inventory>(entity)) {
-				auto& inventory = entities.get<component::Inventory>(entity);
+			if (this->entities()->has<component::Inventory>(entity)) {
+				auto& inventory = this->entities()->get<component::Inventory>(entity);
 				// Weapon triggering
 				if (!inventory.weapons.empty()) {
 					inventory.weapons[0].triggered = !!input->getMouseButton(0);

@@ -9,7 +9,7 @@ class RenderSystem : public System {
 	public:
 		RenderSystem(const City&);
 		void enter(const Time&);
-		void process(EntityRegistry&, const Time&);
+		void process(const Time&);
 		void leave(const Time&);
 
 	private:

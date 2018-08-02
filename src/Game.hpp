@@ -16,8 +16,8 @@ class Game {
 
 	private:
 		Window m_window;
-		EntityRegistry m_entities;
-		EventDispatcher m_events;
+		std::shared_ptr<EntityRegistry> m_entities;
+		std::shared_ptr<EventDispatcher> m_events;
 		SystemManager m_systems;
 		City m_city;
 };

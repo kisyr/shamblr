@@ -27,13 +27,13 @@ void RenderSystem::enter(const Time& time) {
 	glClear(GL_COLOR_BUFFER_BIT);
 }
 
-void RenderSystem::process(EntityRegistry& entities, const Time& time) {
+void RenderSystem::process(const Time& time) {
 	auto input = locateService<InputService>();
 	auto camera = locateService<CameraService>();
 	auto& vertices = m_vertices;
 
 	// Draw sprites
-	entities.view<component::Physics, component::Sprite>().each(
+	entities()->view<component::Physics, component::Sprite>().each(
 		[&camera, &vertices, &time](auto entity, auto& physics, auto& sprite) {
 			vertices.clear();
 
@@ -64,7 +64,7 @@ void RenderSystem::process(EntityRegistry& entities, const Time& time) {
 	);
 
 	// Draw tracers
-	entities.view<component::Tracer>().each(
+	entities()->view<component::Tracer>().each(
 		[&camera](const auto entity, auto& tracer) {
 			const auto p0 = tracer.begin;
 			const auto p1 = tracer.end;
@@ -84,7 +84,7 @@ void RenderSystem::process(EntityRegistry& entities, const Time& time) {
 			glEnd();
 		}
 	);
-	entities.destroy<component::Tracer>();
+	entities()->destroy<component::Tracer>();
 
 	// Draw level
 	{
@@ -107,7 +107,7 @@ void RenderSystem::process(EntityRegistry& entities, const Time& time) {
 	}
 
 	// Draw player aim
-	entities.view<component::Player>().each(
+	entities()->view<component::Player>().each(
 		[&camera](const auto entity, auto& player) {
 			const auto& aim = player.aim;
 			const auto origin = aim.first;
