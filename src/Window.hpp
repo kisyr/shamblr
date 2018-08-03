@@ -1,6 +1,7 @@
 #pragma once
 
 #include <string>
+#include <GL/glew.h>
 #include <GLFW/glfw3.h>
 #include <glm/glm.hpp>
 
@@ -15,6 +16,10 @@ class Window {
 			m_window = glfwCreateWindow(m_size.x, m_size.y, m_name.c_str(), NULL, NULL);
 			if (!m_window) {
 				throw std::runtime_error("glfwCreateWindow");
+			}
+			makeContextCurrent();
+			if (glewInit() != GLEW_OK) {
+				throw std::runtime_error("glewInit");
 			}
 		}
 

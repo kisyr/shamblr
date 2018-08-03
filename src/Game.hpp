@@ -1,20 +1,18 @@
 #pragma once
 
 #include "common.hpp"
-#include "Window.hpp"
-#include "City.hpp"
 #include "system/System.hpp"
+#include "City.hpp"
 
 namespace shamblr {
 
 class Game {
 	public:
-		Game();
+		Game(const glm::ivec2&);
 		void configure();
 		void run();
 
 	private:
-		Window m_window;
 		City m_city;
 		std::shared_ptr<EntityRegistry> m_entities;
 		std::shared_ptr<EventDispatcher> m_events;

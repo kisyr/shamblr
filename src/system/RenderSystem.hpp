@@ -13,12 +13,7 @@ class RenderSystem : public System {
 		void leave(const Time&);
 
 	private:
-		struct Vertex {
-			glm::vec3 position;
-			glm::vec4 color;
-		};
-		std::vector<Vertex> m_vertices;
-		std::vector<Vertex> m_levelVertices;
+		std::vector<glm::vec3> m_levelVertices;
 };
 
 } // namespace shamblr

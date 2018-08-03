@@ -1,7 +1,9 @@
 #include "Game.hpp"
 
-int main() {
-	shamblr::Game game;
+using namespace shamblr;
+
+int main(int argc, char* argv[]) {
+	Game game(glm::ivec2(1280, 768));
 	game.run();
 
 	return EXIT_SUCCESS;

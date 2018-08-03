@@ -8,8 +8,10 @@
 #include <glm/gtc/matrix_transform.hpp>
 #include <glm/gtx/string_cast.hpp>
 #include <entt/entt.hpp>
+#include <tinyformat.h>
 
 #define SHAMBLR_LOG(f_, ...) printf((f_), ##__VA_ARGS__)
+#define SHAMBLR_FMT tfm::format
 
 namespace shamblr {
 

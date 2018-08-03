@@ -1,8 +1,8 @@
-SOURCES = $(wildcard src/*.cpp) $(wildcard src/system/*.cpp)
+SOURCES = $(wildcard src/*.cpp) $(wildcard src/service/*.cpp) $(wildcard src/system/*.cpp) $(wildcard src/*.c)
 
 build-linux:
 	mkdir build
-	g++ -std=c++14 -o build/shamblr -Ilib/include $(SOURCES) -lglfw -lBox2D -lGL
+	g++ -std=c++14 -o build/shamblr -Ilib/include $(SOURCES) -lglfw -lBox2D -lGL -lGLEW
 
 build-windows:
 	mkdir build

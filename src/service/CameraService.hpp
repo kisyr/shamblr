@@ -23,7 +23,7 @@ class CameraService {
 
 		glm::mat4 projection() const {
 			const auto vs = glm::vec2(viewport().z - viewport().x, viewport().w - viewport().y);
-			return glm::perspective(50.0f, 1.0f, 1.0f, 1000.0f);
+			return glm::perspective(50.0f, 1280.0f / 768.0f, 1.0f, 1000.0f);
 		}
 
 		glm::mat4 view() const {

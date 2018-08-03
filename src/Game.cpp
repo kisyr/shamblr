@@ -1,5 +1,6 @@
 #include "Game.hpp"
-#include "service/InputService.hpp"
+#include "service/WindowService.hpp"
+#include "service/GraphicsService.hpp"
 #include "service/CameraService.hpp"
 #include "components.hpp"
 #include "system/RenderSystem.hpp"
@@ -9,16 +10,18 @@
 #include "system/HealthSystem.hpp"
 #include "system/InventorySystem.hpp"
 #include "system/ProjectileSystem.hpp"
+#include "system/HudSystem.hpp"
 #include <algorithm>
 #include <glm/gtc/random.hpp>
 
 using namespace shamblr;
 
-Game::Game() : m_window(Window(glm::ivec2(1280, 1024), "Shamblr")) {
-	auto input = registerService<InputService>(m_window.window());
+Game::Game(const glm::ivec2& windowSize) {
+	auto window = registerService<WindowService>(windowSize);
+	auto graphics = registerService<GraphicsService>();
 	auto camera = registerService<CameraService>();
 
-	camera->viewport(glm::ivec4(0, m_window.size().y, m_window.size().x, -m_window.size().y));
+	camera->viewport(glm::ivec4(0, windowSize.y, windowSize.x, -windowSize.y));
 
 	m_entities = std::make_shared<EntityRegistry>();
 	m_events = std::make_shared<EventDispatcher>();
@@ -29,7 +32,6 @@ Game::Game() : m_window(Window(glm::ivec2(1280, 1024), "Shamblr")) {
 
 void Game::configure() {
 	m_city.generate(glm::vec2(200.0f));
-
 	m_systems->add<RenderSystem>(m_entities, m_events, m_city);
 	m_systems->add<PhysicsSystem>(m_entities, m_events, m_city);
 	m_systems->add<PlayerSystem>(m_entities, m_events);
@@ -37,7 +39,9 @@ void Game::configure() {
 	m_systems->add<HealthSystem>(m_entities, m_events);
 	m_systems->add<InventorySystem>(m_entities, m_events);
 	m_systems->add<ProjectileSystem>(m_entities, m_events);
+	m_systems->add<HudSystem>(m_entities, m_events);
 
+#if 1
 	{
 		auto entity = m_entities->create();
 		m_entities->assign<component::Physics>(entity, 
@@ -60,7 +64,7 @@ void Game::configure() {
 			0.0f
 		});
 	}
-
+#endif
 #if 1
 	auto numZombies = 0;
 	for (auto& r : m_city.roads()) {
@@ -93,27 +97,32 @@ void Game::configure() {
 }
 
 void Game::run() {
-	m_window.makeContextCurrent();
+	auto window = locateService<WindowService>();
+	auto graphics = locateService<GraphicsService>();
 
 	float seconds = 0.0f;
 	int frames = 0;
+	int fps = 0.0f;
+
 	Time time = {0};
-	while (!m_window.shouldClose()) {
-		const float delta = m_window.getTime();
-		m_window.setTime(0);
+	while (window->isOpen()) {
+		const float delta = glfwGetTime();
+		glfwSetTime(0);
 		time.elapsed += delta;
 		time.delta = delta;
 
 		m_systems->update(time);
 		m_events->update();
 
-		m_window.swapBuffers();
-		Window::pollEvents();
+		graphics->drawText("default", tfm::format("FPS: %g", fps), glm::vec2(20.0f), 10.0f, glm::vec4(1.0f));
+
+		graphics->render(window->getSize());
+		window->refresh();
 
 		seconds += time.delta;
 		++frames;
 		if (seconds >= 1.0f) {
-			SHAMBLR_LOG("FPS: %g\n", (float)frames / seconds);
+			fps = (float)frames / seconds;
 			seconds = 0.0f;
 			frames = 0;
 		}
