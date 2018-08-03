@@ -1,6 +1,7 @@
 #include "Game.hpp"
 #include "service/WindowService.hpp"
 #include "service/GraphicsService.hpp"
+#include "service/AudioService.hpp"
 #include "service/CameraService.hpp"
 #include "components.hpp"
 #include "system/RenderSystem.hpp"
@@ -19,6 +20,7 @@ using namespace shamblr;
 Game::Game(const glm::ivec2& windowSize) {
 	auto window = registerService<WindowService>(windowSize);
 	auto graphics = registerService<GraphicsService>();
+	auto audio = registerService<AudioService>();
 	auto camera = registerService<CameraService>();
 
 	camera->viewport(glm::ivec4(0, windowSize.y, windowSize.x, -windowSize.y));

@@ -8,6 +8,10 @@ namespace shamblr {
 
 class ProjectileSystem : public System {
 	public:
+		ProjectileSystem() {
+			auto audio = locateService<AudioService>();
+			audio->createSound("pistol", "resource/pistol.wav");
+		}
 #if 1
 		void configure(std::shared_ptr<EventDispatcher> events) {
 			System::configure(events);
@@ -33,6 +37,9 @@ class ProjectileSystem : public System {
 
 			auto tracer = entities()->create();
 			entities()->assign<component::Tracer>(tracer, e.origin, e.origin + e.direction * e.length);
+
+			auto audio = locateService<AudioService>();
+			audio->playSound("pistol");
 		}
 #endif
 #if 0
