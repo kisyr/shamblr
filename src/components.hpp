@@ -60,6 +60,7 @@ struct Behaviour {
 };
 
 struct Sight {
+	float distance;
 	std::vector<Entity> entities;
 };
 

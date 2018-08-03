@@ -112,6 +112,7 @@ void PhysicsSystem::process(const Time& time) {
 	);
 
 	// Process sight
+	// TODO: Move this maybe?
 #if 1
 	entities()->view<component::Physics, component::Sight>().each(
 		[this, &world](const auto entity, auto& physics, auto& sight) {
@@ -121,14 +122,17 @@ void PhysicsSystem::process(const Time& time) {
 			this->entities()->view<component::Physics, component::Player>().each(
 				[world, &entity, &physics, &sight](const auto otherEntity, auto& otherPhysics, auto& otherPlayer) {
 					if (entity != otherEntity) {
-						auto handler = RayCastClosest(physics.fixture);
-						auto p0 = b2Vec2(physics.position.x, physics.position.z);
-						auto p1 = b2Vec2(otherPhysics.position.x, otherPhysics.position.z);
-						world->RayCast(&handler, p0, p1);
-						if (handler.hitFixture() && handler.hitFixture()->GetUserData()) {
-							const auto hitEntity = *static_cast<Entity*>(handler.hitFixture()->GetUserData());
-							if (hitEntity == otherEntity) {
-								sight.entities.push_back(hitEntity);
+						const auto distance = glm::distance(otherPhysics.position, physics.position);
+						if (distance <= sight.distance) {
+							auto handler = RayCastClosest(physics.fixture);
+							auto p0 = b2Vec2(physics.position.x, physics.position.z);
+							auto p1 = b2Vec2(otherPhysics.position.x, otherPhysics.position.z);
+							world->RayCast(&handler, p0, p1);
+							if (handler.hitFixture() && handler.hitFixture()->GetUserData()) {
+								const auto hitEntity = *static_cast<Entity*>(handler.hitFixture()->GetUserData());
+								if (hitEntity == otherEntity) {
+									sight.entities.push_back(hitEntity);
+								}
 							}
 						}
 					}

@@ -95,7 +95,7 @@ void Game::configure() {
 			);
 			m_entities->assign<component::Health>(entity, 100, 100);
 			m_entities->assign<component::Sprite>(entity);
-			m_entities->assign<component::Sight>(entity);
+			m_entities->assign<component::Sight>(entity, 15.0f);
 			m_entities->assign<component::Behaviour>(entity, component::Behaviour::Type::ZOMBIE);
 
 			++numZombies;
