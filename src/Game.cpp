@@ -43,11 +43,14 @@ void Game::configure() {
 	m_systems->add<ProjectileSystem>(m_entities, m_events);
 	m_systems->add<HudSystem>(m_entities, m_events);
 
+	const auto playerRoad = glm::linearRand(0, (int)m_city.roads().size());
 #if 1
 	{
+		const auto road = m_city.roads()[playerRoad];
+		const auto position = glm::linearRand(road.min(), road.max());
 		auto entity = m_entities->create();
 		m_entities->assign<component::Physics>(entity, 
-			glm::vec3(),
+			glm::vec3(position.x, 0.0f, position.y),
 			glm::vec3(),
 			glm::quat(),
 			1.0f,
@@ -70,6 +73,10 @@ void Game::configure() {
 #if 1
 	auto numZombies = 0;
 	for (auto& r : m_city.roads()) {
+		// Down spawn zombies on player road
+		if (&m_city.roads()[playerRoad] == &r) {
+			continue;
+		}
 		if (glm::linearRand(0.0f, 1.0f) > 0.5f) {
 			continue;
 		}
