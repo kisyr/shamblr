@@ -8,8 +8,8 @@ namespace shamblr {
 class InventorySystem : public System {
 	public:
 		void process(const Time& time) {
-			entities()->view<component::Inventory, component::Player>().each(
-				[this, &time](const auto entity, auto& inventory, auto& player) {
+			entities()->view<component::Inventory, component::Player, component::Health>().each(
+				[this, &time](const auto entity, auto& inventory, auto& player, auto& health) {
 					if (!inventory.weapons.empty()) {
 						auto& weapon = inventory.weapons[0];
 						if (weapon.triggered) {
@@ -23,6 +23,7 @@ class InventorySystem : public System {
 								this->entities()->assign<component::Ray>(bullet, origin, direction);
 								this->entities()->assign<component::Caliber>(bullet, diameter, length);
 								weapon.fired = time.elapsed;
+								health.trauma += 40.0f;
 							}
 						}
 					}

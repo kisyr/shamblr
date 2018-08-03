@@ -59,7 +59,7 @@ class BehaviourSystem : public System {
 				const auto target = players.back();
 				const auto& targetPhysics = entities()->get<component::Physics>(target);
 				if (glm::distance(targetPhysics.position, physics.position) < 2.0f) {
-					this->events()->enqueue<events::Attack>(entity, target);
+					//this->events()->enqueue<events::Damage>(target, 10);
 				}
 			}
 		}

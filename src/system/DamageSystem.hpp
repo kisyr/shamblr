@@ -15,7 +15,7 @@ class DamageSystem : public System {
 		}
 
 		void receiveAttack(const events::Attack& e) {
-			//SHAMBLR_LOG("events::Attack: %d, %d\n", e.origin, e.target);
+			SHAMBLR_LOG("events::Attack: %d, %d\n", e.origin, e.target);
 		}
 
 		void receiveProjectileHit(const events::ProjectileHit& e) {

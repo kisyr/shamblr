@@ -1,16 +1,19 @@
 #include "PlayerSystem.hpp"
 #include "../components.hpp"
 #include "../service/WindowService.hpp"
+#include "../service/GraphicsService.hpp"
 #include "../service/CameraService.hpp"
+#include <glm/gtc/noise.hpp>
 
 using namespace shamblr;
 
 void PlayerSystem::process(const Time& time) {
 	auto window = locateService<WindowService>();
+	auto graphics = locateService<GraphicsService>();
 	auto camera = locateService<CameraService>();
 
-	entities()->view<component::Player, component::Physics>().each(
-		[this, &window, &camera, &time](auto entity, auto& player, auto& physics) {
+	entities()->view<component::Player, component::Physics, component::Health>().each(
+		[this, &window, &graphics, &camera, &time](auto entity, auto& player, auto& physics, auto& health) {
 #if 1
 			const float rotationFactor = 3.0f * time.delta;
 			float rotation = 0.0f;
@@ -35,7 +38,6 @@ void PlayerSystem::process(const Time& time) {
 			movement.x += window->getKey('A') * +movementFactor;
 			movement.x += window->getKey('D') * -movementFactor;
 			physics.velocity += movement;
-			camera->centerOn(physics.position);
 
 			// Update aim
 			const auto screenCursor = window->getMouseCursor();
@@ -52,6 +54,19 @@ void PlayerSystem::process(const Time& time) {
 					inventory.weapons[0].triggered = !!window->getMouseButton(0);
 				}
 			}
+
+			if (window->getKey('T')) {
+				health.trauma = 100.0f;
+			}
+
+			graphics->drawText("default", tfm::format("TRAUMA: %g", health.trauma), glm::vec2(100.0f, 20.0f), 10.0f, glm::vec4(1.0f));
+
+			// Camera follows player
+			auto cameraCenter = physics.position;
+			const auto traumaFactor = glm::pow(health.trauma, 3) * 0.000001f;
+			cameraCenter.x += glm::simplex(glm::vec2(time.elapsed, 0.0f)) * traumaFactor;
+			cameraCenter.z += glm::simplex(glm::vec2(0.0f, time.elapsed)) * traumaFactor;
+			camera->centerOn(cameraCenter);
 		}
 	);
 }

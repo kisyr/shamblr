@@ -37,6 +37,7 @@ struct Ray {
 struct Health {
 	int current;
 	int maximum;
+	float trauma;
 };
 
 struct Sprite {};
