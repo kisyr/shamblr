@@ -16,6 +16,8 @@ class HealthSystem : public System {
 		void process(const Time& time) {
 			entities()->view<component::Health>().each(
 				[&time](const auto entity, auto& health) {
+					// Cap trauma to 200
+					health.trauma = glm::clamp(health.trauma, 0.0f, 200.0f);
 					// Remove 100 trauma in 1 second
 					health.trauma = glm::max(0.0f, health.trauma - ( 100.0f * time.delta));
 				}
