@@ -12,7 +12,7 @@ GraphicsService::GraphicsService() : m_nanovg(NULL) {
 	if (!m_nanovg) {
 		throw std::runtime_error("nvgCreateGL2");
 	}
-	createFont("default", "resource/TeenyTinyPixls.otf");
+	createFont("default", "res/TeenyTinyPixls.otf");
 }
 
 void GraphicsService::createFont(const std::string& name, const std::string& path) {

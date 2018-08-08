@@ -1,0 +1,5 @@
+cmake_minimum_required(VERSION 3.0)
+project(nanovg)
+file(GLOB_RECURSE SOURCES RELATIVE ${CMAKE_CURRENT_SOURCE_DIR} "src/*.c")
+include_directories("${CMAKE_CURRENT_SOURCE_DIR}/src")
+add_library(nanovg STATIC ${SOURCES})
