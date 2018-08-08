@@ -2,22 +2,18 @@
 
 ## Building
 
-### Dependencies
-
-- C++ compiler with C++14 support
-- GLM
-- GLFW
-- Box2D
+Handy script to execute ``cmake`` in vagrant:
 
 ```sh
-apt-get install libglm-dev libglfw-dev libbox2d-dev
+# Linux target
+vagrant ssh -c 'shamblr/run-cmake-linux'
+# Windows target
+vagrant ssh -c 'shamblr/run-cmake-windows'
 ```
 
-### Compiling
-
-Build executable ./build/shamblr
+Another handy script to execute ``make install`` in vagrant:
 
 ```sh
-make clean build
+# Installs in bin/
+vagrant ssh -c 'shamblr/run-make'
 ```
-
