@@ -69,27 +69,24 @@ struct Waypoint {
 	glm::vec3 position;
 };
 
+struct Item {
+	bool used;
+};
+
+struct Weapon {
+	float velocity;
+	int rate;
+	float fired;
+	glm::vec3 origin;
+	glm::vec3 direction;
+};
+
 struct Inventory {
-	struct Weapon {
-		enum class Type {
-			HANDGUN,
-		};
-		Type type;
-		bool triggered;
-		float fired;
-	};
-	std::vector<Weapon> weapons;
+	std::vector<Entity> items;
 };
 
 struct Projectile {
-	glm::vec3 origin;
-	glm::vec3 direction;
 	float velocity;
-};
-
-struct Caliber {
-	float diameter;
-	float length;
 };
 
 } // namespace components

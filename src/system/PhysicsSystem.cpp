@@ -153,14 +153,14 @@ void PhysicsSystem::process(const Time& time) {
 			const auto p1 = ray.origin + ray.direction * length;
 			world->RayCast(&handler, b2Vec2(p0.x, p0.z), b2Vec2(p1.x, p1.z));
 			// Report result
-			auto event = events::RayCast{ray.origin, ray.direction, length * handler.hitFraction()};
+			auto event = events::RayCast{ray.origin, ray.direction, length * handler.hitFraction(), entity};
 			// TODO: Handle multiple intersections/entities (for example bullet penetration)
 			if (handler.hitFixture() && handler.hitFixture()->GetUserData()) {
 				event.entities.push_back(*static_cast<Entity*>(handler.hitFixture()->GetUserData()));
 			}
 			this->events()->enqueue<events::RayCast>(event);
 			// Destroy ray
-			this->entities()->destroy(entity);
+			//this->entities()->destroy(entity);
 		}
 	);
 #endif

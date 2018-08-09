@@ -46,12 +46,22 @@ void PlayerSystem::process(const Time& time) {
 			c0.y = c1.y = 0.0f;
 			player.aim = std::make_pair(c0, glm::normalize(c1 - c0));
 
-			// Handle inventory interaction
+			// Handle inventory
 			if (this->entities()->has<component::Inventory>(entity)) {
 				auto& inventory = this->entities()->get<component::Inventory>(entity);
-				// Weapon triggering
-				if (!inventory.weapons.empty()) {
-					inventory.weapons[0].triggered = !!window->getMouseButton(0);
+				// Update weapon spatials
+				for (const auto& item : inventory.items) {
+					if (this->entities()->has<component::Weapon>(item)) {
+						auto& weapon = this->entities()->get<component::Weapon>(item);
+						weapon.origin = player.aim.first;
+						weapon.direction = player.aim.second;
+					}
+				}
+				// Item triggering
+				if (!inventory.items.empty()) {
+					const auto inventoryItem = inventory.items.front();
+					auto& item = this->entities()->get<component::Item>(inventoryItem);
+					item.used = !!window->getMouseButton(0);
 				}
 			}
 

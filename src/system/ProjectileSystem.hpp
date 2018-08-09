@@ -26,11 +26,17 @@ class ProjectileSystem : public System {
 				e.entities.empty() ? -1 : e.entities[0]
 			);
 
+			int damage = 0;
+			if (entities()->has<component::Projectile>(e.source)) {
+				const auto& projectile = entities()->get<component::Projectile>(e.source);
+				damage = projectile.velocity / 20;
+			}
+
 			for (auto& entity : e.entities) {
 				if (entities()->valid(entity)) {
 					// Apply damage to health
 					if (entities()->has<component::Health>(entity)) {
-						events()->enqueue<events::Damage>(entity, 20);
+						events()->enqueue<events::Damage>(entity, damage);
 					}
 				}
 			}
@@ -40,6 +46,11 @@ class ProjectileSystem : public System {
 
 			auto audio = locateService<AudioService>();
 			audio->playSound("pistol");
+
+			// Destroy ray
+			if (entities()->valid(e.source)) {
+				this->entities()->destroy(e.source);
+			}
 		}
 #endif
 #if 0

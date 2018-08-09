@@ -9,7 +9,8 @@
 #include "system/PlayerSystem.hpp"
 #include "system/BehaviourSystem.hpp"
 #include "system/HealthSystem.hpp"
-#include "system/InventorySystem.hpp"
+//#include "system/InventorySystem.hpp"
+#include "system/WeaponSystem.hpp"
 #include "system/ProjectileSystem.hpp"
 #include "system/HudSystem.hpp"
 #include <algorithm>
@@ -34,12 +35,14 @@ Game::Game(const glm::ivec2& windowSize) {
 
 void Game::configure() {
 	m_city.generate(glm::vec2(200.0f));
+
 	m_systems->add<RenderSystem>(m_entities, m_events, m_city);
 	m_systems->add<PhysicsSystem>(m_entities, m_events, m_city);
 	m_systems->add<PlayerSystem>(m_entities, m_events);
 	m_systems->add<BehaviourSystem>(m_entities, m_events);
 	m_systems->add<HealthSystem>(m_entities, m_events);
-	m_systems->add<InventorySystem>(m_entities, m_events);
+	//m_systems->add<InventorySystem>(m_entities, m_events);
+	m_systems->add<WeaponSystem>(m_entities, m_events);
 	m_systems->add<ProjectileSystem>(m_entities, m_events);
 	m_systems->add<HudSystem>(m_entities, m_events);
 
@@ -63,11 +66,11 @@ void Game::configure() {
 		m_entities->assign<component::Player>(entity);
 		m_entities->assign<component::Behaviour>(entity, component::Behaviour::Type::PLAYER);
 		auto& inventory = m_entities->assign<component::Inventory>(entity);
-		inventory.weapons.push_back({
-			component::Inventory::Weapon::Type::HANDGUN,
-			false,
-			0.0f
-		});
+
+		auto weapon = m_entities->create();
+		m_entities->assign<component::Item>(weapon);
+		m_entities->assign<component::Weapon>(weapon, 400.0f, 800);
+		inventory.items.push_back(weapon);
 	}
 #endif
 #if 1

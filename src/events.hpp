@@ -23,6 +23,7 @@ struct RayCast {
 	glm::vec3 origin;
 	glm::vec3 direction;
 	float length;
+	Entity source;
 	std::vector<Entity> entities;
 };
 
