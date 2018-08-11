@@ -565,15 +565,6 @@ IF(NOT HAVE_STRNCASECMP)
 ENDIF()
 
 CHECK_SYMBOL_EXISTS(strnlen string.h HAVE_STRNLEN)
-CHECK_SYMBOL_EXISTS(snprintf stdio.h HAVE_SNPRINTF)
-IF(NOT HAVE_SNPRINTF)
-    CHECK_FUNCTION_EXISTS(_snprintf HAVE__SNPRINTF)
-    IF(NOT HAVE__SNPRINTF)
-        MESSAGE(FATAL_ERROR "No snprintf function found, please report!")
-    ENDIF()
-
-    SET(CPP_DEFS ${CPP_DEFS} snprintf=_snprintf)
-ENDIF()
 
 CHECK_SYMBOL_EXISTS(isfinite math.h HAVE_ISFINITE)
 IF(NOT HAVE_ISFINITE)
@@ -1326,6 +1317,7 @@ IF(NOT WIN32)
     SET(LIBNAME "openal")
 ELSE()
     SET(LIBNAME "OpenAL32")
+    ADD_DEFINITIONS(-D_TIMESPEC_DEFINED)
 ENDIF()
 
 # Needed for openal.pc.in
