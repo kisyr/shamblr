@@ -23,6 +23,7 @@ class WeaponSystem : public System {
 						this->entities()->assign<component::Ray>(bullet, origin, direction);
 						this->entities()->assign<component::Projectile>(bullet, velocity);
 						weapon.fired = time.elapsed;
+						this->events()->enqueue<events::WeaponFired>(item.owner, recoil);
 					}
 				}
 			);

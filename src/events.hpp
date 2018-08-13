@@ -27,5 +27,10 @@ struct RayCast {
 	std::vector<Entity> entities;
 };
 
+struct WeaponFired {
+	Entity owner;
+	float recoil;
+};
+
 } // namespace events
 } // namespace shamblr

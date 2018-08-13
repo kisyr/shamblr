@@ -10,16 +10,19 @@ class HealthSystem : public System {
 	public:
 		void configure(std::shared_ptr<EventDispatcher> events) {
 			System::configure(events);
-			System::events()->sink<events::Damage>().connect<HealthSystem, &HealthSystem::receiveDamage>(this);
+			System::events()->sink<events::Damage>()
+				.connect<HealthSystem, &HealthSystem::receiveDamage>(this);
+			System::events()->sink<events::WeaponFired>()
+				.connect<HealthSystem, &HealthSystem::receiveWeaponFired>(this);
 		}
 
 		void process(const Time& time) {
 			entities()->view<component::Health>().each(
 				[&time](const auto entity, auto& health) {
-					// Cap trauma to 200
+					// Cap trauma to 100
 					health.trauma = glm::clamp(health.trauma, 0.0f, 200.0f);
-					// Remove 100 trauma in 1 second
-					health.trauma = glm::max(0.0f, health.trauma - ( 100.0f * time.delta));
+					// Remove 100 trauma in 0.5 second
+					health.trauma = glm::max(0.0f, health.trauma - (200.0f * time.delta));
 				}
 			);
 		}
@@ -30,6 +33,16 @@ class HealthSystem : public System {
 			health.trauma += e.amount * 2;
 			if (health.current <= 0) {
 				entities()->destroy(e.victim);
+			}
+		}
+
+		void receiveWeaponFired(const events::WeaponFired& e) {
+			SHAMBLR_LOG("WeaponFire(owner: %d, recoil: %g)\n", e.owner, e.recoil);
+			if (this->entities()->valid(e.owner)) {
+				if (this->entities()->has<component::Health>(e.owner)) {
+					auto& health = this->entities()->get<component::Health>(e.owner);
+					health.trauma += e.recoil * 10.0f;
+				}
 			}
 		}
 };

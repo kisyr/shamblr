@@ -70,6 +70,7 @@ struct Waypoint {
 };
 
 struct Item {
+	Entity owner;
 	bool used;
 };
 

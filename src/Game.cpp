@@ -68,7 +68,7 @@ void Game::configure() {
 		auto& inventory = m_entities->assign<component::Inventory>(entity);
 
 		auto weapon = m_entities->create();
-		m_entities->assign<component::Item>(weapon);
+		m_entities->assign<component::Item>(weapon, entity);
 		m_entities->assign<component::Weapon>(weapon, 400.0f, 800);
 		inventory.items.push_back(weapon);
 	}
