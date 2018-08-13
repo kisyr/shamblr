@@ -3,6 +3,7 @@
 #include "System.hpp"
 #include "../components.hpp"
 #include "../events.hpp"
+#include "../util.hpp"
 
 namespace shamblr {
 
@@ -11,17 +12,17 @@ class BehaviourSystem : public System {
 		void process(const Time& time) {
 			// Map behaviour
 			entities()->view<component::Behaviour>().each(
-				[this](const auto entity, auto& behaviour) {
+				[this, &time](const auto entity, auto& behaviour) {
 					switch (behaviour.type) {
 						case component::Behaviour::Type::ZOMBIE:
-							this->behaveZombie(entity);
+							this->behaveZombie(entity, time);
 							break;
 					}
 				}
 			);
 		}
 
-		void behaveZombie(const Entity entity) {
+		void behaveZombie(const Entity entity, const Time& time) {
 			auto& physics = entities()->get<component::Physics>(entity);
 			auto& sight = entities()->get<component::Sight>(entity);
 
@@ -51,7 +52,13 @@ class BehaviourSystem : public System {
 			if (entities()->has<component::Waypoint>(entity)) {
 				const auto& waypoint = entities()->get<component::Waypoint>(entity);
 				const auto direction = glm::normalize(waypoint.position - physics.position);
-				physics.velocity = direction * 2.0f;
+				const auto angle = glm::atan(direction.x, direction.z);
+				const auto orientation = glm::quat(glm::vec3(0.0f, angle, 0.0f));
+				const float maxAngle = glm::pi<float>() * 0.25f * time.delta;
+				const auto deltaAngle = util::angleBetween(physics.orientation, orientation);
+				const auto movementSpeed = glm::max(1.0f - (deltaAngle / glm::half_pi<float>()), 0.3f);
+				physics.orientation = util::rotateTowards(physics.orientation, orientation, maxAngle);
+				physics.velocity += (physics.orientation * glm::vec3(0.0f, 0.0f, 1.0f)) * movementSpeed;
 			}
 
 			// Attack target
