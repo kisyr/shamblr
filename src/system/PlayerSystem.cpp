@@ -31,7 +31,7 @@ void PlayerSystem::process(const Time& time) {
 			physics.velocity += direction * movement;
 #endif
 			// 5 m/s running speed
-			const auto movementFactor = 2.5f;
+			const auto movementFactor = 2.5f + (window->getKey(GLFW_KEY_LEFT_SHIFT) * 2.5f);
 			auto movement = glm::vec3(0.0f);
 			movement.z += window->getKey('W') * +movementFactor;
 			movement.z += window->getKey('S') * -movementFactor;
