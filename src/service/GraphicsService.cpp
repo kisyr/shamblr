@@ -4,15 +4,66 @@
 #define NANOVG_GL2_IMPLEMENTATION
 #include <nanovg.h>
 #include <nanovg_gl.h>
+#include <gls/gls.hpp>
+#include <fstream>
 
 using namespace shamblr;
 
+std::string loadFile(const std::string& path) {
+	std::ifstream file(path);
+	if (file.fail()) {
+		throw std::runtime_error(SHAMBLR_FMT("readFile %s", path));
+	}
+	std::stringstream buffer;
+	buffer << file.rdbuf();
+	return buffer.str();
+}
+
 GraphicsService::GraphicsService() : m_nanovg(NULL) {
+	// Initialize nanovg
 	m_nanovg = nvgCreateGL2(NVG_STENCIL_STROKES | NVG_DEBUG);
 	if (!m_nanovg) {
 		throw std::runtime_error("nvgCreateGL2");
 	}
+
+	// Create default font
 	createFont("default", "res/TeenyTinyPixls.otf");
+
+	// Create line batch
+	{
+		// Buffer
+		m_buffers["lines"] = gls::BufferCreate(
+			GL_DYNAMIC_DRAW,
+			sizeof(Vertex) * 2 * NumLines,
+			NULL
+		);
+		// Program
+		const auto vSource = loadFile("res/identity.vs.glsl");
+		const auto fSource = loadFile("res/identity.fs.glsl");
+		const std::vector<gls::ProgramShaderInfo> shaders = {
+			{ GL_VERTEX_SHADER, vSource.c_str() },
+			{ GL_FRAGMENT_SHADER, fSource.c_str() },
+		};
+		m_programs["lines"] = gls::ProgramCreate(shaders);
+	}
+
+	// Create triangle batch
+	{
+		// Buffer
+		m_buffers["triangles"] = gls::BufferCreate(
+			GL_DYNAMIC_DRAW,
+			sizeof(Vertex) * 3 * NumTriangles,
+			NULL
+		);
+		// Program
+		const auto vSource = loadFile("res/identity.vs.glsl");
+		const auto fSource = loadFile("res/identity.fs.glsl");
+		const std::vector<gls::ProgramShaderInfo> shaders = {
+			{ GL_VERTEX_SHADER, vSource.c_str() },
+			{ GL_FRAGMENT_SHADER, fSource.c_str() },
+		};
+		m_programs["triangles"] = gls::ProgramCreate(shaders);
+	}
 }
 
 void GraphicsService::createFont(const std::string& name, const std::string& path) {
@@ -20,30 +71,76 @@ void GraphicsService::createFont(const std::string& name, const std::string& pat
 }
 
 void GraphicsService::drawLines(const std::vector<glm::vec3>& vertices, const glm::mat4& transform) {
-	m_drawVerticesCommands.push_back(DrawVerticesCommand{GL_LINES, vertices, transform});
+	for (auto& v : vertices) {
+		m_lineVertices.push_back(Vertex{ transform * glm::vec4(v, 1.0f) });
+	}
 }
 
 void GraphicsService::drawTriangles(const std::vector<glm::vec3>& vertices, const glm::mat4& transform) {
-	m_drawVerticesCommands.push_back(DrawVerticesCommand{GL_TRIANGLES, vertices, transform});
+	for (auto& v : vertices) {
+		m_triangleVertices["default"].push_back(Vertex{ transform * glm::vec4(v, 1.0f) });
+	}
 }
 
 void GraphicsService::drawText(const std::string& font, const std::string& text, const glm::vec2& position, const float size, const glm::vec4& color) {
 	m_drawTextCommands.push_back(DrawTextCommand{font, text, position, size, color});
 }
 
-void GraphicsService::render(const glm::ivec2& screen) {
+void GraphicsService::flush(const glm::ivec2& screen) {
 	glPolygonMode(GL_FRONT_AND_BACK, GL_LINE);
+
 	glClearColor(0.3f, 0.3f, 0.3f, 1.0f);
 	glClear(GL_COLOR_BUFFER_BIT);
-	for (auto& dvc : m_drawVerticesCommands) {
-		glMatrixMode(GL_MODELVIEW);
-		glLoadMatrixf(&dvc.transform[0][0]);
-		glBegin(dvc.topology);
-		for (auto& v : dvc.vertices) {
-			glVertex3f(v.x, v.y, v.z);
-		}
-		glEnd();
+
+	// Draw lines
+	{
+		const auto& buffer = m_buffers["lines"];
+		const auto& program = m_programs["lines"];
+		auto& vertices = m_lineVertices;
+
+		gls::BufferBind(GL_ARRAY_BUFFER, buffer);
+		gls::BufferWrite(
+			GL_ARRAY_BUFFER, 
+			sizeof(Vertex) * vertices.size(),
+			vertices.data()
+		);
+		gls::VertexArrayAttributeEnable(0);
+		gls::VertexArrayAttributePointer(
+			0, 4, GL_FLOAT, GL_FALSE, sizeof(Vertex), 0);
+		gls::ProgramBind(program);
+		gls::DrawArrays(GL_LINES, 0, vertices.size());
+		gls::ProgramBind(0);
+		gls::BufferBind(GL_ARRAY_BUFFER, 0);
+		vertices.clear();
 	}
+
+	// Draw triangles
+	for (auto& p : m_triangleVertices) {
+		if (p.second.empty()) {
+			continue;
+		}
+
+		const auto& buffer = m_buffers["triangles"];
+		const auto& program = m_programs["identity"];
+		auto& vertices = p.second;
+
+		gls::BufferBind(GL_ARRAY_BUFFER, buffer);
+		gls::BufferWrite(
+			GL_ARRAY_BUFFER, 
+			sizeof(Vertex) * vertices.size(),
+			vertices.data()
+		);
+		gls::VertexArrayAttributeEnable(0);
+		gls::VertexArrayAttributePointer(
+			0, 4, GL_FLOAT, GL_FALSE, sizeof(Vertex), 0);
+		gls::ProgramBind(program);
+		gls::DrawArrays(GL_TRIANGLES, 0, vertices.size());
+		gls::ProgramBind(0);
+		gls::BufferBind(GL_ARRAY_BUFFER, 0);
+		vertices.clear();
+	}
+
+	// Draw fonts
 	glPolygonMode(GL_FRONT_AND_BACK, GL_FILL);
 	const auto identity = glm::mat4();
 	glMatrixMode(GL_MODELVIEW);
@@ -56,6 +153,4 @@ void GraphicsService::render(const glm::ivec2& screen) {
 		nvgText(m_nanovg, dtc.position.x, dtc.position.y, dtc.string.c_str(), NULL);
 	}
 	nvgEndFrame(m_nanovg);
-	m_drawVerticesCommands.clear();
-	m_drawTextCommands.clear();
 }
