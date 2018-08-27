@@ -8,6 +8,7 @@
 #include "system/PhysicsSystem.hpp"
 #include "system/PlayerSystem.hpp"
 #include "system/BehaviourSystem.hpp"
+#include "system/MovementSystem.hpp"
 #include "system/HealthSystem.hpp"
 //#include "system/InventorySystem.hpp"
 #include "system/WeaponSystem.hpp"
@@ -40,6 +41,7 @@ void Game::configure() {
 	m_systems->add<PhysicsSystem>(m_entities, m_events, m_city);
 	m_systems->add<PlayerSystem>(m_entities, m_events);
 	m_systems->add<BehaviourSystem>(m_entities, m_events);
+	m_systems->add<MovementSystem>(m_entities, m_events);
 	m_systems->add<HealthSystem>(m_entities, m_events);
 	//m_systems->add<InventorySystem>(m_entities, m_events);
 	m_systems->add<WeaponSystem>(m_entities, m_events);
@@ -98,7 +100,7 @@ void Game::configure() {
 			);
 			m_entities->assign<component::Health>(entity, 100, 100);
 			m_entities->assign<component::Sprite>(entity);
-			m_entities->assign<component::Sight>(entity, 15.0f);
+			m_entities->assign<component::Sight>(entity, 10.0f);
 			m_entities->assign<component::Behaviour>(entity, component::Behaviour::Type::ZOMBIE);
 
 			++numZombies;
@@ -128,7 +130,7 @@ void Game::run() {
 
 		graphics->drawText("default", tfm::format("FPS: %g", fps), glm::vec2(20.0f), 10.0f, glm::vec4(1.0f));
 
-		graphics->render(window->getSize());
+		graphics->flush(window->getSize());
 		window->refresh();
 
 		seconds += time.delta;

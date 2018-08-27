@@ -92,7 +92,7 @@ inline size_t generateBoxVertices(
 	out.insert(out.end(), vertices, vertices + count);
 	return count;
 }
-
+#if 0
 inline float angleBetween(
 	glm::quat q1,
 	glm::quat q2
@@ -112,6 +112,32 @@ inline float angleBetween(
 	}
 	
 	return glm::acos(cosTheta);
+}
+#endif
+inline float angleBetween(
+	const glm::quat& x,
+	const glm::quat& y
+) {
+	glm::quat z = y;
+
+	float cosTheta = glm::dot(x, y);
+
+	// If cosTheta < 0, the interpolation will take the long way around the sphere. 
+	// To fix this, one quat must be negated.
+	if (cosTheta < float(0)) {
+		z        = -y;
+		cosTheta = -cosTheta;
+	}
+
+	// Perform a linear interpolation when cosTheta is close to 1 to avoid side effect of sin(angle) becoming a zero denominator
+	if(cosTheta > float(1) - glm::epsilon<float>()) {
+		return float(0);
+	}
+
+	// Essential Mathematics, page 467
+	float angle = glm::acos(cosTheta);
+
+	return angle;
 }
 
 inline glm::quat rotateTowards(
