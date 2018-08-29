@@ -33,6 +33,7 @@ add_executable(shamblr
 	src/system/PhysicsSystem.cpp
 	src/system/PlayerSystem.cpp
 	src/system/RenderSystem.cpp
+	src/system/SpriteRenderSystem.cpp
 )
 target_include_directories(shamblr PUBLIC dep/glew/include)
 target_include_directories(shamblr PUBLIC dep/Box2D)

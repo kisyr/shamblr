@@ -5,6 +5,7 @@
 #include "service/CameraService.hpp"
 #include "components.hpp"
 #include "system/RenderSystem.hpp"
+#include "system/SpriteRenderSystem.hpp"
 #include "system/PhysicsSystem.hpp"
 #include "system/PlayerSystem.hpp"
 #include "system/BehaviourSystem.hpp"
@@ -37,7 +38,8 @@ Game::Game(const glm::ivec2& windowSize) {
 void Game::configure() {
 	m_city.generate(glm::vec2(200.0f));
 
-	m_systems->add<RenderSystem>(m_entities, m_events, m_city);
+	//m_systems->add<RenderSystem>(m_entities, m_events, m_city);
+	m_systems->add<SpriteRenderSystem>(m_entities, m_events);
 	m_systems->add<PhysicsSystem>(m_entities, m_events, m_city);
 	m_systems->add<PlayerSystem>(m_entities, m_events);
 	m_systems->add<BehaviourSystem>(m_entities, m_events);
@@ -125,12 +127,17 @@ void Game::run() {
 		time.elapsed += delta;
 		time.delta = delta;
 
+		glPolygonMode(GL_FRONT_AND_BACK, GL_LINE);
+
+		glClearColor(0.3f, 0.3f, 0.3f, 1.0f);
+		glClear(GL_COLOR_BUFFER_BIT);
+
 		m_systems->update(time);
 		m_events->update();
 
-		graphics->drawText("default", tfm::format("FPS: %g", fps), glm::vec2(20.0f), 10.0f, glm::vec4(1.0f));
+		//graphics->drawText("default", tfm::format("FPS: %g", fps), glm::vec2(20.0f), 10.0f, glm::vec4(1.0f));
 
-		graphics->flush(window->getSize());
+		//graphics->flush(window->getSize());
 		window->refresh();
 
 		seconds += time.delta;

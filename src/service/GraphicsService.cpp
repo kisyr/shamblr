@@ -1,11 +1,7 @@
 #include "GraphicsService.hpp"
-#include <GL/glew.h>
-#include <GLFW/glfw3.h>
 #define NANOVG_GL2_IMPLEMENTATION
-#include <nanovg.h>
-#include <nanovg_gl.h>
-#include <gls/gls.hpp>
 #include <fstream>
+#include "../graphics.hpp"
 
 using namespace shamblr;
 
