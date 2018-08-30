@@ -40,7 +40,13 @@ struct Health {
 	float trauma;
 };
 
-struct Sprite {};
+struct Sprite {
+	std::string description;
+	std::string batch;
+	std::vector<glm::vec4> frames;
+	size_t frame;
+	float elapsed;
+};
 
 struct Tracer {
 	glm::vec3 begin;

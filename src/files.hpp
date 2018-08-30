@@ -49,9 +49,6 @@ static inline bool loadImage(const std::string& path, Image& image) {
 		sizeof(GLubyte) * image.width * image.height * image.bpp
 	);
 	stbi_image_free(pixels);
-	SHAMBLR_LOG("Loaded image (%s, %d, %d, %d)\n",
-		path, image.width, image.height, image.bpp
-	);
 	return true;
 }
 

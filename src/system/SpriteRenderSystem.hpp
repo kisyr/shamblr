@@ -8,9 +8,11 @@ namespace shamblr {
 class SpriteRenderSystem : public System {
 	public:
 		SpriteRenderSystem();
+		void configure();
 		void enter(const Time&);
 		void process(const Time&);
 		void leave(const Time&);
+		void constructSprite(EntityRegistry&, Entity);
 
 	private:
 		struct Vertex {
@@ -20,6 +22,7 @@ class SpriteRenderSystem : public System {
 		struct Batch {
 			GLuint texture;
 			GLuint buffer;
+			GLuint array;
 			std::vector<Vertex> vertices;
 		};
 

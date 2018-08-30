@@ -2,18 +2,9 @@
 #define NANOVG_GL2_IMPLEMENTATION
 #include <fstream>
 #include "../graphics.hpp"
+#include "../files.hpp"
 
 using namespace shamblr;
-
-std::string loadFile(const std::string& path) {
-	std::ifstream file(path);
-	if (file.fail()) {
-		throw std::runtime_error(SHAMBLR_FMT("readFile %s", path));
-	}
-	std::stringstream buffer;
-	buffer << file.rdbuf();
-	return buffer.str();
-}
 
 GraphicsService::GraphicsService() : m_nanovg(NULL) {
 	// Initialize nanovg
@@ -24,7 +15,7 @@ GraphicsService::GraphicsService() : m_nanovg(NULL) {
 
 	// Create default font
 	createFont("default", "res/TeenyTinyPixls.otf");
-
+#if 0
 	// Create line batch
 	{
 		// Buffer
@@ -60,6 +51,7 @@ GraphicsService::GraphicsService() : m_nanovg(NULL) {
 		};
 		m_programs["triangles"] = gls::ProgramCreate(shaders);
 	}
+#endif
 }
 
 void GraphicsService::createFont(const std::string& name, const std::string& path) {
@@ -87,7 +79,7 @@ void GraphicsService::flush(const glm::ivec2& screen) {
 
 	glClearColor(0.3f, 0.3f, 0.3f, 1.0f);
 	glClear(GL_COLOR_BUFFER_BIT);
-
+#if 0
 	// Draw lines
 	{
 		const auto& buffer = m_buffers["lines"];
@@ -135,7 +127,7 @@ void GraphicsService::flush(const glm::ivec2& screen) {
 		gls::BufferBind(GL_ARRAY_BUFFER, 0);
 		vertices.clear();
 	}
-
+#endif
 	// Draw fonts
 	glPolygonMode(GL_FRONT_AND_BACK, GL_FILL);
 	const auto identity = glm::mat4();

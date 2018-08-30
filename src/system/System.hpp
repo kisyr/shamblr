@@ -10,6 +10,7 @@ namespace shamblr {
 class System {
 	public:
 		virtual ~System() {}
+		virtual void configure() {}
 		virtual void enter(const Time&) {}
 		virtual void process(const Time&) {}
 		virtual void leave(const Time&) {}
@@ -48,6 +49,7 @@ class SystemManager {
 			m_systems[typeid(T)] = std::make_shared<T>(args...);
 			m_systems[typeid(T)]->configure(entities);
 			m_systems[typeid(T)]->configure(events);
+			m_systems[typeid(T)]->configure();
 		}
 
 		template <class T>

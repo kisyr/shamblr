@@ -66,7 +66,7 @@ void Game::configure() {
 			nullptr
 		);
 		m_entities->assign<component::Health>(entity, 100, 100);
-		m_entities->assign<component::Sprite>(entity);
+		m_entities->assign<component::Sprite>(entity, "res/test.json");
 		m_entities->assign<component::Player>(entity);
 		m_entities->assign<component::Behaviour>(entity, component::Behaviour::Type::PLAYER);
 		auto& inventory = m_entities->assign<component::Inventory>(entity);
@@ -101,7 +101,7 @@ void Game::configure() {
 				nullptr
 			);
 			m_entities->assign<component::Health>(entity, 100, 100);
-			m_entities->assign<component::Sprite>(entity);
+			m_entities->assign<component::Sprite>(entity, "res/test.json");
 			m_entities->assign<component::Sight>(entity, 10.0f);
 			m_entities->assign<component::Behaviour>(entity, component::Behaviour::Type::ZOMBIE);
 

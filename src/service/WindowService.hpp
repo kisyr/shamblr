@@ -15,6 +15,9 @@ class WindowService {
 			if (!glfwInit()) {
 				throw std::runtime_error("glfwInit");
 			}
+			glfwWindowHint(GLFW_CONTEXT_VERSION_MAJOR, 4);
+			glfwWindowHint(GLFW_CONTEXT_VERSION_MINOR, 0);
+			glfwWindowHint(GLFW_OPENGL_PROFILE, GLFW_OPENGL_CORE_PROFILE);
 			m_window = glfwCreateWindow(size.x, size.y, "Shamblr", NULL, NULL);
 			if (!m_window) {
 				throw std::runtime_error("glfwCreateWindow");
