@@ -31,8 +31,22 @@ void SpriteRenderSystem::process(const Time& time) {
 	auto camera = locateService<CameraService>();
 
 	// Animate
-	entities()->view<component::Sprite>().each(
-		[this, &time](const auto entity, auto& sprite) {
+	entities()->view<component::Sprite, component::Physics>().each(
+		[this, &time](const auto entity, auto& sprite, auto& physics) {
+			// Check for new cycle state
+			std::string cycle = "idle";
+			const auto absVelocity = glm::abs(physics.velocity);
+			if (glm::any(glm::greaterThan(absVelocity, glm::vec3(0)))) {
+				cycle = "move";
+			}
+
+			// Update cycle state
+			if (cycle != sprite.cycle) {
+				sprite.cycle = cycle;
+				sprite.cycleIndex = 0;
+			}
+
+			// Advance cycle
 			sprite.elapsed += time.delta;
 			if (sprite.elapsed > 1.0f) {
 				sprite.elapsed = 0.0f;
@@ -46,14 +60,14 @@ void SpriteRenderSystem::process(const Time& time) {
 		[this, &camera](const auto entity, auto& sprite, const auto& physics) {
 			const glm::mat4 projection = camera->projection();
 			const glm::mat4 view = camera->view();
-			const glm::mat4 translation = glm::translate(glm::mat4(), physics.position);			const glm::mat4 rotation = glm::mat4_cast(physics.orientation);
+			const glm::mat4 translation = glm::translate(glm::mat4(), physics.position);
+			const glm::mat4 rotation = glm::mat4_cast(physics.orientation);
 			const glm::mat4 scale = glm::scale(glm::mat4(), glm::vec3(physics.size / 2.0f));
 			const glm::mat4 model = translation * rotation * scale;
 			const glm::mat4 mvp = projection * view * model;
 
-			const auto frameIndex = sprite.cycles[sprite.cycle][sprite.cycleIndex];
-			//const auto frameIndex = 0;
-			const auto uv = sprite.frames[frameIndex];
+			const auto f = sprite.cycles[sprite.cycle][sprite.cycleIndex];
+			const auto uv = sprite.frames[f];
 			const auto vertices = std::vector<Vertex>{
 				{ mvp * glm::vec4(-1.0f, +0.0f, -1.0f, +1.0f), glm::vec2(uv.x, uv.y) },
 				{ mvp * glm::vec4(-1.0f, +0.0f, +1.0f, +1.0f), glm::vec2(uv.x, uv.w) },
