@@ -36,14 +36,14 @@ void SpriteRenderSystem::process(const Time& time) {
 			sprite.elapsed += time.delta;
 			if (sprite.elapsed > 1.0f) {
 				sprite.elapsed = 0.0f;
-				sprite.frame = (sprite.frame + 1) % sprite.frames.size();
+				sprite.cycleIndex = (sprite.cycleIndex + 1) % sprite.cycles[sprite.cycle].size();
 			}
 		}
 	);
 
 	// Draw
 	entities()->view<component::Sprite, component::Physics>().each(
-		[this, &camera](const auto entity, const auto& sprite, const auto& physics) {
+		[this, &camera](const auto entity, auto& sprite, const auto& physics) {
 			const glm::mat4 projection = camera->projection();
 			const glm::mat4 view = camera->view();
 			const glm::mat4 translation = glm::translate(glm::mat4(), physics.position);			const glm::mat4 rotation = glm::mat4_cast(physics.orientation);
@@ -51,14 +51,16 @@ void SpriteRenderSystem::process(const Time& time) {
 			const glm::mat4 model = translation * rotation * scale;
 			const glm::mat4 mvp = projection * view * model;
 
-			const auto uv = sprite.frames[sprite.frame];
+			const auto frameIndex = sprite.cycles[sprite.cycle][sprite.cycleIndex];
+			//const auto frameIndex = 0;
+			const auto uv = sprite.frames[frameIndex];
 			const auto vertices = std::vector<Vertex>{
-				{ mvp * glm::vec4(-1.0f, +0.0f, -1.0f, +1.0f), glm::vec2(uv.x, uv.z) },
+				{ mvp * glm::vec4(-1.0f, +0.0f, -1.0f, +1.0f), glm::vec2(uv.x, uv.y) },
 				{ mvp * glm::vec4(-1.0f, +0.0f, +1.0f, +1.0f), glm::vec2(uv.x, uv.w) },
-				{ mvp * glm::vec4(+1.0f, +0.0f, -1.0f, +1.0f), glm::vec2(uv.y, uv.z) },
+				{ mvp * glm::vec4(+1.0f, +0.0f, -1.0f, +1.0f), glm::vec2(uv.z, uv.y) },
 				{ mvp * glm::vec4(-1.0f, +0.0f, +1.0f, +1.0f), glm::vec2(uv.x, uv.w) },
-				{ mvp * glm::vec4(+1.0f, +0.0f, +1.0f, +1.0f), glm::vec2(uv.y, uv.w) },
-				{ mvp * glm::vec4(+1.0f, +0.0f, -1.0f, +1.0f), glm::vec2(uv.y, uv.z) },
+				{ mvp * glm::vec4(+1.0f, +0.0f, +1.0f, +1.0f), glm::vec2(uv.z, uv.w) },
+				{ mvp * glm::vec4(+1.0f, +0.0f, -1.0f, +1.0f), glm::vec2(uv.x, uv.y) },
 			};
 
 			auto& batch = this->m_batches[sprite.batch];
@@ -82,7 +84,6 @@ void SpriteRenderSystem::leave(const Time&) {
 		glEnable(GL_BLEND);
 		glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
 
-		SHAMBLR_LOG("Binding buffer %d\n", buffer);
 		gls::BufferBind(GL_ARRAY_BUFFER, buffer);
 		gls::BufferWrite(
 			GL_ARRAY_BUFFER, 
@@ -108,18 +109,21 @@ void SpriteRenderSystem::constructSprite(EntityRegistry&, Entity entity) {
 	// Assign sprite batch key
 	sprite.batch = spriteInfo["image"];
 
-	// Read frame data
-	for (auto& f : spriteInfo["frames"]) {
-		int w = spriteInfo["size"][0];
-		int h = spriteInfo["size"][1];
-		int u0 = f[0];
-		int u1 = f[1];
-		int v0 = f[2];
-		int v1 = f[3];
-		sprite.frames.push_back( glm::vec4(u0, v0, u1, v1) / glm::vec4(w, h, w, h));
+	// Read animation data
+	for (const auto& f : spriteInfo["frames"]) {
+		sprite.frames.push_back(glm::vec4(f[0], f[1], f[2], f[3]));
+	}
+	const std::map<std::string, std::vector<int>> spriteCycles = spriteInfo["cycles"];
+	for (const auto& c : spriteCycles) {
+		const auto n = c.first;
+		for (const auto& i : c.second) {
+			sprite.cycles[n].push_back(i);
+		}
 	}
 
-	// Initialize timing
+	// Initialize vars
+	sprite.cycle = "idle";
+	sprite.cycleIndex = 0;
 	sprite.elapsed = 0.0f;
 
 	if (m_batches.find(sprite.batch) == m_batches.end()) {

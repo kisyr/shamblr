@@ -44,7 +44,9 @@ struct Sprite {
 	std::string description;
 	std::string batch;
 	std::vector<glm::vec4> frames;
-	size_t frame;
+	std::unordered_map<std::string, std::vector<size_t>> cycles;
+	std::string cycle;
+	size_t cycleIndex;
 	float elapsed;
 };
 
