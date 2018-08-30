@@ -2,12 +2,20 @@
 
 #include <vector>
 #include <cstring>
+#include <cstdio>
 
 namespace gls {
 
 // Common
 
+#ifndef GLS_LOGGING_VERBOSE
+#define GLS_LOG(Format, ...)
+#else
+#define GLS_LOG(Format, ...) fprintf(stdout, Format, ##__VA_ARGS__)
+#endif
+
 #define GLS_HANDLE(Expr) \
+	GLS_LOG("%s\n", #Expr); \
 	Expr; \
 	gLastResult = glGetError(); \
 	if (gLastResult != GL_NO_ERROR)
@@ -262,8 +270,8 @@ static inline GLuint TextureCreate2D(
 	TextureBind(GL_TEXTURE_2D, texture);
 	TextureParameter(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
 	TextureParameter(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
-	TextureGenerateMipmap(GL_TEXTURE_2D);
 	TextureImage2D(GL_TEXTURE_2D, format, image);
+	TextureGenerateMipmap(GL_TEXTURE_2D);
 	return texture;
 }
 
@@ -328,6 +336,23 @@ struct ProgramShaderInfo {
 	const GLchar* source;
 };
 
+template <GLenum Name>
+static inline GLint ShaderInfo(const GLuint shader) {
+	GLint result;
+	GLS_HANDLE(glGetShaderiv(shader, Name, &result)) {
+		return HandleError(gLastResult, "glGetShaderiv");
+	}
+	return result;
+}
+
+static inline std::string ShaderInfoLog(const GLuint shader) {
+	std::string log(ShaderInfo<GL_INFO_LOG_LENGTH>(shader), '\0');
+	GLS_HANDLE(glGetShaderInfoLog(shader, log.size(), NULL, &log[0])) {
+		return "";
+	}
+	return log;
+}
+
 static inline GLuint ShaderCreate(const GLenum type, GLenum* error = NULL) {
 	GLuint shader;
 	GLS_HANDLE(shader = glCreateShader(type)) {
@@ -359,6 +384,10 @@ static inline GLenum ShaderSource(
 static inline GLenum ShaderCompile(const GLuint shader) {
 	GLS_HANDLE(glCompileShader(shader)) {
 		return HandleError(gLastResult, "glCompileShader");
+	}
+	if (ShaderInfo<GL_COMPILE_STATUS>(shader) == GL_FALSE) {
+		const auto log = ShaderInfoLog(shader);
+		return HandleError(GL_INVALID_OPERATION, "ShaderCompile", log.c_str());
 	}
 	return GL_NO_ERROR;
 }
@@ -413,7 +442,7 @@ static inline GLenum ProgramLink(const GLuint program) {
 	}
 	if (ProgramInfo<GL_LINK_STATUS>(program) == GL_FALSE) {
 		const auto log = ProgramInfoLog(program);
-		return HandleError(GL_INVALID_OPERATION, "ProgramBuild", log.c_str());
+		return HandleError(GL_INVALID_OPERATION, "ProgramLink", log.c_str());
 	}
 	return GL_NO_ERROR;
 }
