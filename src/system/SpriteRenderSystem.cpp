@@ -1,8 +1,8 @@
 #include "SpriteRenderSystem.hpp"
-#include "../service/CameraService.hpp"
+#include "../components.hpp"
 #include "../graphics.hpp"
 #include "../files.hpp"
-#include "../components.hpp"
+#include "../service/CameraService.hpp"
 
 using namespace shamblr;
 

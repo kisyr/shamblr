@@ -547,6 +547,36 @@ struct ProgramUniformFn<glm::vec4> {
 		return GL_NO_ERROR;
 	}
 };
+
+template <>
+struct ProgramUniformFn<glm::mat2> {
+	static GLuint set(const GLint location, const glm::mat2& value, const GLsizei count, GLboolean transpose = GL_FALSE) {
+		GLS_HANDLE(glUniformMatrix2fv(location, count, transpose, (const GLfloat*)&value)) {
+			return HandleError(gLastResult, "glUniformMatrix2fv");
+		}
+		return GL_NO_ERROR;
+	}
+};
+
+template <>
+struct ProgramUniformFn<glm::mat3> {
+	static GLuint set(const GLint location, const glm::mat3& value, const GLsizei count, GLboolean transpose = GL_FALSE) {
+		GLS_HANDLE(glUniformMatrix3fv(location, count, transpose, (const GLfloat*)&value)) {
+			return HandleError(gLastResult, "glUniformMatrix3fv");
+		}
+		return GL_NO_ERROR;
+	}
+};
+
+template <>
+struct ProgramUniformFn<glm::mat4> {
+	static GLuint set(const GLint location, const glm::mat4& value, const GLsizei count, GLboolean transpose = GL_FALSE) {
+		GLS_HANDLE(glUniformMatrix4fv(location, count, transpose, (const GLfloat*)&value)) {
+			return HandleError(gLastResult, "glUniformMatrix4fv");
+		}
+		return GL_NO_ERROR;
+	}
+};
 #endif
 
 template <class T>

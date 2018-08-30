@@ -38,7 +38,7 @@ Game::Game(const glm::ivec2& windowSize) {
 void Game::configure() {
 	m_city.generate(glm::vec2(200.0f));
 
-	//m_systems->add<RenderSystem>(m_entities, m_events, m_city);
+	m_systems->add<RenderSystem>(m_entities, m_events, m_city);
 	m_systems->add<SpriteRenderSystem>(m_entities, m_events);
 	m_systems->add<PhysicsSystem>(m_entities, m_events, m_city);
 	m_systems->add<PlayerSystem>(m_entities, m_events);
@@ -77,7 +77,7 @@ void Game::configure() {
 		inventory.items.push_back(weapon);
 	}
 #endif
-#if 1
+#if 0
 	auto numZombies = 0;
 	for (auto& r : m_city.roads()) {
 		// Down spawn zombies on player road
