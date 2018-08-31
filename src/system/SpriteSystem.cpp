@@ -44,6 +44,7 @@ void SpriteSystem::process(const Time& time) {
 			if (cycle != sprite.cycle) {
 				sprite.cycle = cycle;
 				sprite.cycleIndex = 0;
+				sprite.elapsed = 0.0f;
 			}
 
 			// Advance cycle
