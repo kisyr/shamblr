@@ -10,7 +10,7 @@ class ProjectileSystem : public System {
 	public:
 		ProjectileSystem() {
 			auto audio = locateService<AudioService>();
-			audio->createSound("pistol", "res/pistol.wav");
+			audio->createSound("pistol", "res/sound/pistol.wav");
 		}
 #if 1
 		void configure(std::shared_ptr<EventDispatcher> events) {
