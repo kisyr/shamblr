@@ -50,40 +50,23 @@ void WorldSystem::enter(const Time& time) {
 void WorldSystem::process(const Time& time) {
 	auto camera = locateService<CameraService>();
 
-	// Draw tracers
-#if 0
-	entities()->view<component::Tracer>().each(
-		[&graphics, &camera](const auto entity, auto& tracer) {
-			const auto p0 = tracer.begin;
-			const auto p1 = tracer.end;
+	const glm::mat4 projection = camera->projection();
+	const glm::mat4 view = camera->view();
+	const glm::mat4 translation = glm::translate(glm::mat4(), glm::vec3(0.0f));
+	const glm::mat4 scale = glm::scale(glm::mat4(), glm::vec3(1.0f));
+	const glm::mat4 model = translation * scale;
+	const glm::mat4 mvp = projection * view * model;
 
-			const glm::mat4 projection = camera->projection();
-			const glm::mat4 view = camera->view();
-			const glm::mat4 model = glm::translate(glm::mat4(), glm::vec3(0.0f));
-			const glm::mat4 mvp = projection * view * model;
+	glPolygonMode(GL_FRONT_AND_BACK, GL_LINE);
+	glEnable(GL_BLEND);
+	glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
 
-			graphics->drawLines(std::vector<glm::vec3>{p0, p1}, mvp);
-		}
-	);
-	entities()->destroy<component::Tracer>();
-#endif
-
-	// Draw level
-	{
-		const glm::mat4 projection = camera->projection();
-		const glm::mat4 view = camera->view();
-		const glm::mat4 translation = glm::translate(glm::mat4(), glm::vec3(0.0f));
-		const glm::mat4 scale = glm::scale(glm::mat4(), glm::vec3(1.0f));
-		const glm::mat4 model = translation * scale;
-		const glm::mat4 mvp = projection * view * model;
-
-		gls::VertexArrayBind(m_levelArray);
-		gls::ProgramBind(m_levelProgram);
-		gls::ProgramUniform("u_Mvp", mvp);
-		gls::DrawArrays(GL_TRIANGLES, 0, m_levelVertices.size());
-		gls::ProgramBind(0);
-		gls::VertexArrayBind(0);
-	}
+	gls::VertexArrayBind(m_levelArray);
+	gls::ProgramBind(m_levelProgram);
+	gls::ProgramUniform("u_Mvp", mvp);
+	gls::DrawArrays(GL_TRIANGLES, 0, m_levelVertices.size());
+	gls::ProgramBind(0);
+	gls::VertexArrayBind(0);
 
 	// Draw player aim
 #if 0
