@@ -35,9 +35,11 @@ RenderSystem::RenderSystem(const City& city) {
 	gls::BufferBind(GL_ARRAY_BUFFER, 0);
 
 	// Create city program
+	const auto vSource = loadFile("res/default.vs.glsl");
+	const auto fSource = loadFile("res/default.fs.glsl");
 	const std::vector<gls::ProgramShaderInfo> shaderInfo = {
-		{ GL_VERTEX_SHADER, loadFile("res/default.vs.glsl").c_str() },
-		{ GL_FRAGMENT_SHADER, loadFile("res/default.fs.glsl").c_str() },
+		{ GL_VERTEX_SHADER, vSource.c_str() },
+		{ GL_FRAGMENT_SHADER, fSource.c_str() },
 	};
 	m_levelProgram = gls::ProgramCreate(shaderInfo);
 }

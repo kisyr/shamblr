@@ -1,11 +1,11 @@
 #version 330
 
-uniform mat4 u_mvp;
-in vec3 v_position;
-in vec2 v_texcoord;
-out vec2 f_texcoord;
+uniform mat4 u_Mvp;
+in vec3 vs_Position;
+in vec2 vs_TexCoord;
+out vec2 fs_TexCoord;
 
 void main() {
-	f_texcoord = v_texcoord;
-	gl_Position = u_mvp * vec4(v_position, 1.0);
+	fs_TexCoord = vs_TexCoord;
+	gl_Position = u_Mvp * vec4(vs_Position, 1.0);
 }
