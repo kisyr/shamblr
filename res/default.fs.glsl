@@ -6,5 +6,5 @@ out vec4 fs_Color;
 
 void main() {
 	fs_Color = vec4(0);
-	fs_Color += texture2D(u_Sampler, f_TexCoord);
+	fs_Color += texture2D(u_Sampler, fs_TexCoord);
 }
