@@ -17,7 +17,7 @@ class SpriteSystem : public System {
 	private:
 		struct Vertex {
 			glm::vec4 position;
-			glm::vec2 texture;
+			glm::vec2 texcoord;
 		};
 		struct Batch {
 			GLuint texture;

@@ -49,7 +49,7 @@ void SpriteSystem::process(const Time& time) {
 
 			// Advance cycle
 			sprite.elapsed += time.delta;
-			if (sprite.elapsed > 1.0f) {
+			if (sprite.elapsed > 1.0f / sprite.rate) {
 				sprite.elapsed = 0.0f;
 				sprite.cycleIndex = (sprite.cycleIndex + 1) % sprite.cycles[sprite.cycle].size();
 			}
@@ -75,7 +75,7 @@ void SpriteSystem::process(const Time& time) {
 				{ mvp * glm::vec4(+1.0f, +0.0f, -1.0f, +1.0f), glm::vec2(uv.z, uv.y) },
 				{ mvp * glm::vec4(-1.0f, +0.0f, +1.0f, +1.0f), glm::vec2(uv.x, uv.w) },
 				{ mvp * glm::vec4(+1.0f, +0.0f, +1.0f, +1.0f), glm::vec2(uv.z, uv.w) },
-				{ mvp * glm::vec4(+1.0f, +0.0f, -1.0f, +1.0f), glm::vec2(uv.x, uv.y) },
+				{ mvp * glm::vec4(+1.0f, +0.0f, -1.0f, +1.0f), glm::vec2(uv.z, uv.y) },
 			};
 
 			auto& batch = this->m_batches[sprite.batch];
@@ -139,6 +139,7 @@ void SpriteSystem::constructSprite(EntityRegistry&, Entity entity) {
 	// Initialize vars
 	sprite.cycle = "idle";
 	sprite.cycleIndex = 0;
+	sprite.rate = spriteInfo["rate"];
 	sprite.elapsed = 0.0f;
 
 	if (m_batches.find(sprite.batch) == m_batches.end()) {

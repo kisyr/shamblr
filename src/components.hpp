@@ -47,6 +47,7 @@ struct Sprite {
 	std::unordered_map<std::string, std::vector<size_t>> cycles;
 	std::string cycle;
 	size_t cycleIndex;
+	int rate;
 	float elapsed;
 };
 
