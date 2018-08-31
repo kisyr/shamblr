@@ -81,7 +81,7 @@ void Game::configure() {
 		inventory.items.push_back(weapon);
 	}
 #endif
-#if 0
+#if 1
 	auto numZombies = 0;
 	for (auto& r : m_city.roads()) {
 		// Down spawn zombies on player road
