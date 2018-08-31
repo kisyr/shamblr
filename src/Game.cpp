@@ -4,8 +4,8 @@
 #include "service/AudioService.hpp"
 #include "service/CameraService.hpp"
 #include "components.hpp"
-#include "system/RenderSystem.hpp"
-#include "system/SpriteRenderSystem.hpp"
+#include "system/WorldSystem.hpp"
+#include "system/SpriteSystem.hpp"
 #include "system/StrokeSystem.hpp"
 #include "system/LifetimeSystem.hpp"
 #include "system/PhysicsSystem.hpp"
@@ -40,8 +40,8 @@ Game::Game(const glm::ivec2& windowSize) {
 void Game::configure() {
 	m_city.generate(glm::vec2(200.0f));
 
-	m_systems->add<RenderSystem>(m_entities, m_events, m_city);
-	m_systems->add<SpriteRenderSystem>(m_entities, m_events);
+	m_systems->add<WorldSystem>(m_entities, m_events, m_city);
+	m_systems->add<SpriteSystem>(m_entities, m_events);
 	m_systems->add<StrokeSystem>(m_entities, m_events);
 	m_systems->add<LifetimeSystem>(m_entities, m_events);
 	m_systems->add<PhysicsSystem>(m_entities, m_events, m_city);
