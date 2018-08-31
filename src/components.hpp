@@ -50,7 +50,7 @@ struct Sprite {
 	float elapsed;
 };
 
-struct Tracer {
+struct Stroke {
 	glm::vec3 begin;
 	glm::vec3 end;
 };
@@ -96,6 +96,10 @@ struct Inventory {
 
 struct Projectile {
 	float velocity;
+};
+
+struct Lifetime {
+	float left;
 };
 
 } // namespace components

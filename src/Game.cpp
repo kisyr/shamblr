@@ -6,6 +6,8 @@
 #include "components.hpp"
 #include "system/RenderSystem.hpp"
 #include "system/SpriteRenderSystem.hpp"
+#include "system/StrokeSystem.hpp"
+#include "system/LifetimeSystem.hpp"
 #include "system/PhysicsSystem.hpp"
 #include "system/PlayerSystem.hpp"
 #include "system/BehaviourSystem.hpp"
@@ -40,6 +42,8 @@ void Game::configure() {
 
 	m_systems->add<RenderSystem>(m_entities, m_events, m_city);
 	m_systems->add<SpriteRenderSystem>(m_entities, m_events);
+	m_systems->add<StrokeSystem>(m_entities, m_events);
+	m_systems->add<LifetimeSystem>(m_entities, m_events);
 	m_systems->add<PhysicsSystem>(m_entities, m_events, m_city);
 	m_systems->add<PlayerSystem>(m_entities, m_events);
 	m_systems->add<BehaviourSystem>(m_entities, m_events);

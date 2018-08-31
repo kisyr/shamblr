@@ -42,7 +42,8 @@ class ProjectileSystem : public System {
 			}
 
 			auto tracer = entities()->create();
-			entities()->assign<component::Tracer>(tracer, e.origin, e.origin + e.direction * e.length);
+			entities()->assign<component::Stroke>(tracer, e.origin, e.origin + e.direction * e.length);
+			entities()->assign<component::Lifetime>(tracer, 2.0f);
 
 			auto audio = locateService<AudioService>();
 			audio->playSound("pistol");
