@@ -11,7 +11,7 @@ namespace shamblr {
 inline std::string loadFile(const std::string& path) {
 	std::ifstream file(path);
 	if (file.fail()) {
-		throw std::runtime_error(SHAMBLR_FMT("loadFile %s", path));
+		throw std::runtime_error(SHAMBLR_FMT("loadFile: %s", path));
 	}
 	std::stringstream buffer;
 	buffer << file.rdbuf();
@@ -31,8 +31,8 @@ struct Image {
 	std::vector<unsigned char> pixels;
 };
 
-static inline bool loadImage(const std::string& path, Image& image) {
-	GLubyte* pixels = stbi_load(
+inline bool loadImage(const std::string& path, Image& image) {
+	unsigned char* pixels = stbi_load(
 		path.c_str(),
 		&image.width,
 		&image.height,
@@ -40,7 +40,7 @@ static inline bool loadImage(const std::string& path, Image& image) {
 		0
 	);
 	if (!pixels) {
-		throw std::runtime_error(stbi_failure_reason());
+		throw std::runtime_error(SHAMBLR_FMT("loadImage: %s", stbi_failure_reason()));
 	}
 	image.pixels.resize(image.width * image.height * image.bpp);
 	memcpy(
