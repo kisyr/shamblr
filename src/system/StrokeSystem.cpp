@@ -25,8 +25,8 @@ void StrokeSystem::configure() {
 	gls::BufferBind(GL_ARRAY_BUFFER, 0);
 
 	// Create program
-	const auto vSource = loadFile("res/identity.vs.glsl");
-	const auto fSource = loadFile("res/identity.fs.glsl");
+	const auto vSource = loadFile("res/shader/identity.vs.glsl");
+	const auto fSource = loadFile("res/shader/identity.fs.glsl");
 	const std::vector<gls::ProgramShaderInfo> shaderInfo = {
 		{ GL_VERTEX_SHADER, vSource.c_str() },
 		{ GL_FRAGMENT_SHADER, fSource.c_str() },

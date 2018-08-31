@@ -1,5 +1,5 @@
 {
-	"image": "res/test.png",
+	"image": "res/texture/test.png",
 	"frames": [
 		[ 0.0, 0.0, 1.0, 0.3 ],
 		[ 0.0, 0.3, 1.0, 0.6 ],
