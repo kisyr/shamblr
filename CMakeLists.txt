@@ -28,7 +28,6 @@ add_subdirectory(dep/openal-soft EXCLUDE_FROM_ALL)
 add_executable(shamblr 
 	src/main.cpp
 	src/Game.cpp
-	src/service/GraphicsService.cpp
 	src/system/HudSystem.cpp
 	src/system/PhysicsSystem.cpp
 	src/system/PlayerSystem.cpp

@@ -16,6 +16,7 @@ namespace gls {
 
 #define GLS_HANDLE(Expr) \
 	GLS_LOG("%s\n", #Expr); \
+	while (glGetError() != GL_NO_ERROR); \
 	Expr; \
 	gLastResult = glGetError(); \
 	if (gLastResult != GL_NO_ERROR)

@@ -1,6 +1,5 @@
 #include "Game.hpp"
 #include "service/WindowService.hpp"
-#include "service/GraphicsService.hpp"
 #include "service/AudioService.hpp"
 #include "service/CameraService.hpp"
 #include "components.hpp"
@@ -33,7 +32,6 @@ Game::Game() {
 	const float distance = options["zoom"];
 
 	auto window = registerService<WindowService>(resolution);
-	auto graphics = registerService<GraphicsService>();
 	auto audio = registerService<AudioService>();
 	auto camera = registerService<CameraService>(
 		distance,
@@ -128,7 +126,6 @@ void Game::configure() {
 
 void Game::run() {
 	auto window = locateService<WindowService>();
-	auto graphics = locateService<GraphicsService>();
 
 	float seconds = 0.0f;
 	int frames = 0;
@@ -141,17 +138,12 @@ void Game::run() {
 		time.elapsed += delta;
 		time.delta = delta;
 
-		glPolygonMode(GL_FRONT_AND_BACK, GL_LINE);
-
-		glClearColor(0.3f, 0.3f, 0.3f, 1.0f);
-		glClear(GL_COLOR_BUFFER_BIT);
+		glClearColor(0.0f, 0.0f, 0.0f, 1.0f);
+		glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
 		m_systems->update(time);
 		m_events->update();
 
-		//graphics->drawText("default", tfm::format("FPS: %g", fps), glm::vec2(20.0f), 10.0f, glm::vec4(1.0f));
-
-		//graphics->flush(window->getSize());
 		window->refresh();
 
 		seconds += time.delta;

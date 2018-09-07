@@ -1,7 +1,6 @@
 #include "PlayerSystem.hpp"
 #include "../components.hpp"
 #include "../service/WindowService.hpp"
-#include "../service/GraphicsService.hpp"
 #include "../service/CameraService.hpp"
 #include <glm/gtc/noise.hpp>
 
@@ -14,11 +13,10 @@ PlayerSystem::PlayerSystem(
 
 void PlayerSystem::process(const Time& time) {
 	auto window = locateService<WindowService>();
-	auto graphics = locateService<GraphicsService>();
 	auto camera = locateService<CameraService>();
 
 	entities()->view<component::Player, component::Physics, component::Health>().each(
-		[this, &window, &graphics, &camera, &time](auto entity, auto& player, auto& physics, auto& health) {
+		[this, &window, &camera, &time](auto entity, auto& player, auto& physics, auto& health) {
 #if 1
 			const float rotationFactor = 3.0f * time.delta;
 			float rotation = 0.0f;
@@ -73,8 +71,6 @@ void PlayerSystem::process(const Time& time) {
 			if (window->getKey('T')) {
 				health.trauma = 100.0f;
 			}
-
-			graphics->drawText("default", tfm::format("TRAUMA: %g", health.trauma), glm::vec2(100.0f, 20.0f), 10.0f, glm::vec4(1.0f));
 
 			// Camera follows player
 			auto cameraCenter = physics.position;
