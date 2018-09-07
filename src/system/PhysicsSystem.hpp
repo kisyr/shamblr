@@ -10,8 +10,7 @@ namespace shamblr {
 
 class PhysicsSystem : public System {
 	public:
-		PhysicsSystem(const City&);
-		void configure(std::shared_ptr<EntityRegistry>);
+		PhysicsSystem(std::shared_ptr<EntityRegistry>, std::shared_ptr<EventDispatcher>, const City&);
 		void process(const Time&);
 		void constructPhysics(EntityRegistry&, Entity);
 		void destructPhysics(EntityRegistry&, Entity);

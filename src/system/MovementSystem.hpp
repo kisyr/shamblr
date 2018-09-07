@@ -7,6 +7,11 @@ namespace shamblr {
 
 class MovementSystem : public System {
 	public:
+		MovementSystem(
+			std::shared_ptr<EntityRegistry> entities,
+			std::shared_ptr<EventDispatcher> events
+		) : System(entities, events) {}
+
 		void process(const Time& time) {
 			// Process waypoints
 			entities()->view<component::Physics, component::Waypoint>().each(

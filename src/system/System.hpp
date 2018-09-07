@@ -10,20 +10,14 @@ namespace shamblr {
 class System {
 	public:
 		virtual ~System() {}
-		virtual void configure() {}
 		virtual void enter(const Time&) {}
 		virtual void process(const Time&) {}
 		virtual void leave(const Time&) {}
 
-		virtual void configure(std::shared_ptr<EntityRegistry> entities) {
-			m_entities = entities;
-		}
+		System(std::shared_ptr<EntityRegistry> entities, std::shared_ptr<EventDispatcher> events) : 
+			m_entities(entities), m_events(events) {}
 
-		virtual void configure(std::shared_ptr<EventDispatcher> events) {
-			m_events = events;
-		}
-
-		virtual void update(const Time& time) {
+		void update(const Time& time) {
 			enter(time);
 			process(time);
 			leave(time);
@@ -45,11 +39,12 @@ class System {
 class SystemManager {
 	public:
 		template <class T, class... Args>
-		void add(std::shared_ptr<EntityRegistry> entities, std::shared_ptr<EventDispatcher> events, Args... args) {
-			m_systems[typeid(T)] = std::make_shared<T>(args...);
-			m_systems[typeid(T)]->configure(entities);
-			m_systems[typeid(T)]->configure(events);
-			m_systems[typeid(T)]->configure();
+		void add(
+			std::shared_ptr<EntityRegistry> entities,
+			std::shared_ptr<EventDispatcher> events,
+			Args... args
+		) {
+			m_systems[typeid(T)] = std::make_shared<T>(entities, events, args...);
 		}
 
 		template <class T>

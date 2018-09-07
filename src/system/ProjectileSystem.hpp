@@ -8,14 +8,15 @@ namespace shamblr {
 
 class ProjectileSystem : public System {
 	public:
-		ProjectileSystem() {
+		ProjectileSystem(
+			std::shared_ptr<EntityRegistry> entities,
+			std::shared_ptr<EventDispatcher> events
+		) : System(entities, events) {
 			auto audio = locateService<AudioService>();
 			audio->createSound("pistol", "res/sound/pistol.wav");
-		}
-#if 1
-		void configure(std::shared_ptr<EventDispatcher> events) {
-			System::configure(events);
-			System::events()->sink<events::RayCast>().connect<ProjectileSystem, &ProjectileSystem::receiveRayCast>(this);
+
+			System::events()->sink<events::RayCast>()
+				.connect<ProjectileSystem, &ProjectileSystem::receiveRayCast>(this);
 		}
 
 		void receiveRayCast(const events::RayCast& e) {
@@ -53,31 +54,6 @@ class ProjectileSystem : public System {
 				this->entities()->destroy(e.source);
 			}
 		}
-#endif
-#if 0
-		void process(EntityRegistry& entities, const Time& time) {
-			auto events = locateService<EventDispatcher>();
-
-			entities()->view<component::CastedRay>().each(
-				[&entities, &events](const auto entity, auto& castedRay) {
-					SHAMBLR_LOG("CastedRay {%s, %s, %s, %d}\n",
-						glm::to_string(castedRay.origin).c_str(),
-						glm::to_string(castedRay.direction).c_str(),
-						glm::to_string(castedRay.point).c_str(),
-						castedRay.target
-					);
-#if 0
-					// Apply damage to health
-					if (entities()->has<component::Health>(castedRay.target)) {
-						events->enqueue<events::Damage>(castedRay.target, 20);
-					}
-#endif
-					// Remove this projectile
-					entities()->destroy(entity);
-				}
-			);
-		}
-#endif
 };
 
 } // namespace shamblr

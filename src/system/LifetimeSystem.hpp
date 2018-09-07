@@ -6,6 +6,11 @@ namespace shamblr {
 
 class LifetimeSystem : public System {
 	public:
+		LifetimeSystem(
+			std::shared_ptr<EntityRegistry> entities,
+			std::shared_ptr<EventDispatcher> events
+		) : System(entities, events) {}
+
 		void process(const Time& time) {
 			entities()->view<component::Lifetime>().each(
 				[this, &time](const auto entity, auto& lifetime) {

@@ -46,7 +46,11 @@ class RayCastClosest : public b2RayCastCallback {
 		float32 m_closestFraction;
 };
 
-PhysicsSystem::PhysicsSystem(const City& city) {
+PhysicsSystem::PhysicsSystem(
+	std::shared_ptr<EntityRegistry> entities,
+	std::shared_ptr<EventDispatcher> events,
+	const City& city
+) : System(entities, events) {
 	{
 		m_world = new b2World(b2Vec2(0.0f, 0.0f));
 		b2BodyDef groundDef;
@@ -80,12 +84,11 @@ PhysicsSystem::PhysicsSystem(const City& city) {
 
 		m_level = body;
 	}
-}
 
-void PhysicsSystem::configure(std::shared_ptr<EntityRegistry> entities) {
-	System::configure(entities);
-	System::entities()->construction<component::Physics>().connect<PhysicsSystem, &PhysicsSystem::constructPhysics>(this);
-	System::entities()->destruction<component::Physics>().connect<PhysicsSystem, &PhysicsSystem::destructPhysics>(this);
+	System::entities()->construction<component::Physics>()
+		.connect<PhysicsSystem, &PhysicsSystem::constructPhysics>(this);
+	System::entities()->destruction<component::Physics>()
+		.connect<PhysicsSystem, &PhysicsSystem::destructPhysics>(this);
 }
 
 void PhysicsSystem::process(const Time& time) {

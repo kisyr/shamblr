@@ -8,7 +8,7 @@ namespace shamblr {
 
 class WorldSystem : public System {
 	public:
-		WorldSystem(const City&);
+		WorldSystem(std::shared_ptr<EntityRegistry>, std::shared_ptr<EventDispatcher>, const City&);
 		void enter(const Time&);
 		void process(const Time&);
 		void leave(const Time&);

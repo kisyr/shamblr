@@ -7,6 +7,11 @@ namespace shamblr {
 
 class InventorySystem : public System {
 	public:
+		InventorySystem(
+			std::shared_ptr<EntityRegistry> entities,
+			std::shared_ptr<EventDispatcher> events
+		) : System(entities, events) {}
+
 		void process(const Time& time) {
 #if 0
 			entities()->view<component::Inventory, component::Player, component::Health>().each(

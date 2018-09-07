@@ -7,8 +7,7 @@ namespace shamblr {
 
 class SpriteSystem : public System {
 	public:
-		SpriteSystem();
-		void configure();
+		SpriteSystem(std::shared_ptr<EntityRegistry>, std::shared_ptr<EventDispatcher>);
 		void enter(const Time&);
 		void process(const Time&);
 		void leave(const Time&);

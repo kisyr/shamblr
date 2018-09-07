@@ -4,5 +4,9 @@
 
 using namespace shamblr;
 
-void HudSystem::process(const Time& time) {
-}
+HudSystem::HudSystem(
+	std::shared_ptr<EntityRegistry> entities,
+	std::shared_ptr<EventDispatcher> events
+) : System(entities, events) {}
+
+void HudSystem::process(const Time& time) {}

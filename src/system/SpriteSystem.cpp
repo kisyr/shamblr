@@ -6,7 +6,10 @@
 
 using namespace shamblr;
 
-SpriteSystem::SpriteSystem() {
+SpriteSystem::SpriteSystem(
+	std::shared_ptr<EntityRegistry> entities,
+	std::shared_ptr<EventDispatcher> events
+) : System(entities, events) {
 	const auto vSource = loadFile("res/shader/identity.vs.glsl");
 	const auto fSource = loadFile("res/shader/identity.fs.glsl");
 	const std::vector<gls::ProgramShaderInfo> shaderInfo = {
@@ -14,10 +17,8 @@ SpriteSystem::SpriteSystem() {
 		{ GL_FRAGMENT_SHADER, fSource.c_str() },
 	};
 	m_program = gls::ProgramCreate(shaderInfo);
-}
 
-void SpriteSystem::configure() {
-	entities()->construction<component::Sprite>()
+	System::entities()->construction<component::Sprite>()
 		.connect<SpriteSystem, &SpriteSystem::constructSprite>(this);
 }
 

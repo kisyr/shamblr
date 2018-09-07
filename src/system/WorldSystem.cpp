@@ -7,7 +7,11 @@
 
 using namespace shamblr;
 
-WorldSystem::WorldSystem(const City& city) {
+WorldSystem::WorldSystem(
+	std::shared_ptr<EntityRegistry> entities,
+	std::shared_ptr<EventDispatcher> events,
+	const City& city
+) : System(entities, events) {
 	// Create city geometry
 	for (auto& r : city.lots()) {
 		util::generateBoxVertices(

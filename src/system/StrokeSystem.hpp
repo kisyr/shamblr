@@ -9,7 +9,7 @@ class StrokeSystem : public System {
 	public:
 		enum { MaxStrokes = 1000 };
 
-		void configure();
+		StrokeSystem(std::shared_ptr<EntityRegistry>, std::shared_ptr<EventDispatcher>);
 		void enter(const Time&);
 		void process(const Time&);
 		void leave(const Time&);

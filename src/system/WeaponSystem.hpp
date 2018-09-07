@@ -7,6 +7,11 @@ namespace shamblr {
 
 class WeaponSystem : public System {
 	public:
+		WeaponSystem(
+			std::shared_ptr<EntityRegistry> entities,
+			std::shared_ptr<EventDispatcher> events
+		) : System(entities, events) {}
+
 		void process(const Time& time) {
 			entities()->view<component::Item, component::Weapon>().each(
 				[this, &time](const auto entity, auto& item, auto& weapon) {

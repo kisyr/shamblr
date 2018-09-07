@@ -8,8 +8,10 @@ namespace shamblr {
 
 class HealthSystem : public System {
 	public:
-		void configure(std::shared_ptr<EventDispatcher> events) {
-			System::configure(events);
+		HealthSystem(
+			std::shared_ptr<EntityRegistry> entities,
+			std::shared_ptr<EventDispatcher> events
+		) : System(entities, events) {
 			System::events()->sink<events::Damage>()
 				.connect<HealthSystem, &HealthSystem::receiveDamage>(this);
 			System::events()->sink<events::WeaponFired>()

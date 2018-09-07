@@ -9,6 +9,11 @@ namespace shamblr {
 
 class BehaviourSystem : public System {
 	public:
+		BehaviourSystem(
+			std::shared_ptr<EntityRegistry> entities,
+			std::shared_ptr<EventDispatcher> events
+		) : System(entities, events) {}
+
 		void process(const Time& time) {
 			// Map behaviour
 			entities()->view<component::Behaviour>().each(

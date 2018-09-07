@@ -7,6 +7,11 @@
 
 using namespace shamblr;
 
+PlayerSystem::PlayerSystem(
+	std::shared_ptr<EntityRegistry> entities,
+	std::shared_ptr<EventDispatcher> events
+) : System(entities, events) {}
+
 void PlayerSystem::process(const Time& time) {
 	auto window = locateService<WindowService>();
 	auto graphics = locateService<GraphicsService>();
