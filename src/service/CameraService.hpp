@@ -7,7 +7,8 @@ namespace shamblr {
 
 class CameraService {
 	public:
-		CameraService() : m_distance(50.0f) {}
+		CameraService(const float distance, const glm::ivec4& viewport) :
+			m_distance(distance), m_viewport(viewport) {}
 
 		void centerOn(const glm::vec3& position) {
 			m_target = position;
@@ -15,10 +16,6 @@ class CameraService {
 
 		glm::vec3 unProject(const glm::vec3& point) const {
 			return glm::unProject(point, view(), projection(), glm::vec4(m_viewport));
-		}
-
-		void viewport(const glm::ivec4& value) {
-			m_viewport = value;
 		}
 
 		glm::mat4 projection() const {

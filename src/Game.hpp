@@ -8,7 +8,7 @@ namespace shamblr {
 
 class Game {
 	public:
-		Game(const glm::ivec2&);
+		Game();
 		void configure();
 		void run();
 

@@ -17,18 +17,28 @@
 #include "system/WeaponSystem.hpp"
 #include "system/ProjectileSystem.hpp"
 #include "system/HudSystem.hpp"
+#include "files.hpp"
+
 #include <algorithm>
 #include <glm/gtc/random.hpp>
 
 using namespace shamblr;
 
-Game::Game(const glm::ivec2& windowSize) {
-	auto window = registerService<WindowService>(windowSize);
+Game::Game() {
+	const auto options = loadJson("res/options.json");
+	const auto resolution = glm::ivec2(
+		options["resolution"][0],
+		options["resolution"][1]
+	);
+	const float distance = options["zoom"];
+
+	auto window = registerService<WindowService>(resolution);
 	auto graphics = registerService<GraphicsService>();
 	auto audio = registerService<AudioService>();
-	auto camera = registerService<CameraService>();
-
-	camera->viewport(glm::ivec4(0, windowSize.y, windowSize.x, -windowSize.y));
+	auto camera = registerService<CameraService>(
+		distance,
+		glm::ivec4(0, resolution.y, resolution.x, -resolution.y)
+	);
 
 	m_entities = std::make_shared<EntityRegistry>();
 	m_events = std::make_shared<EventDispatcher>();
