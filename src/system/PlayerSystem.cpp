@@ -8,8 +8,9 @@ using namespace shamblr;
 
 PlayerSystem::PlayerSystem(
 	std::shared_ptr<EntityRegistry> entities,
-	std::shared_ptr<EventDispatcher> events
-) : System(entities, events) {}
+	std::shared_ptr<EventDispatcher> events,
+	const std::vector<Control>& controls
+) : System(entities, events), m_controls(controls) {}
 
 void PlayerSystem::process(const Time& time) {
 	auto window = locateService<WindowService>();
@@ -36,10 +37,22 @@ void PlayerSystem::process(const Time& time) {
 			// 5 m/s running speed
 			const auto movementFactor = 2.5f + (window->getKey(GLFW_KEY_LEFT_SHIFT) * 2.5f);
 			auto movement = glm::vec3(0.0f);
-			movement.z += window->getKey('W') * +movementFactor;
-			movement.z += window->getKey('S') * -movementFactor;
-			movement.x += window->getKey('A') * +movementFactor;
-			movement.x += window->getKey('D') * -movementFactor;
+			for (auto& c : m_controls) {
+				switch (true) {
+					case c.action == "moveUp":
+						movement.z += window->getKey(c.key.c_str().at(0)) * +movementFactor;
+						break;
+					case c.action == "moveDown":
+						movement.z += window->getKey(c.key.c_str().at(0)) * -movementFactor;
+						break;
+					case c.action == "moveLeft":
+						movement.x += window->getKey(c.key.c_str().at(0)) * +movementFactor;
+						break;
+					case c.action == "moveRight":
+						movement.x += window->getKey(c.key.c_str().at(0)) * -movementFactor;
+						break;
+				}
+			}
 			physics.velocity += movement;
 
 			// Update aim

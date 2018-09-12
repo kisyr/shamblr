@@ -1,4 +1,11 @@
 {
 	"resolution": [ 640, 480 ],
-	"zoom": 50.0
+	"zoom": 50.0,
+	"controls": [
+		{ "key": "w", "action": "moveUp" },
+		{ "key": "s", "action": "moveDown" },
+		{ "key": "a", "action": "moveLeft" },
+		{ "key": "d", "action": "moveRight" },
+		{ "button": "left", "action": "useItem" }
+	]
 }

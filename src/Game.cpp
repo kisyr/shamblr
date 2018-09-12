@@ -24,12 +24,13 @@
 using namespace shamblr;
 
 Game::Game() {
-	const auto options = loadJson("res/options.json");
+	m_options = loadJson("res/options.json");
+
 	const auto resolution = glm::ivec2(
-		options["resolution"][0],
-		options["resolution"][1]
+		m_options["resolution"][0],
+		m_options["resolution"][1]
 	);
-	const float distance = options["zoom"];
+	const float distance = m_options["zoom"];
 
 	auto window = registerService<WindowService>(resolution);
 	auto audio = registerService<AudioService>();
@@ -48,12 +49,21 @@ Game::Game() {
 void Game::configure() {
 	m_city.generate(glm::vec2(200.0f));
 
+	std::vector<PlayerSystem::Control> controls;
+	for (const auto& c : m_options["controls"]) {
+		controls.push_back(PlayerSystem::Control{
+			c["key"],
+			c["button"],
+			c["action"]
+		}
+	);
+
 	m_systems->add<WorldSystem>(m_entities, m_events, m_city);
 	m_systems->add<SpriteSystem>(m_entities, m_events);
 	m_systems->add<StrokeSystem>(m_entities, m_events);
 	m_systems->add<LifetimeSystem>(m_entities, m_events);
 	m_systems->add<PhysicsSystem>(m_entities, m_events, m_city);
-	m_systems->add<PlayerSystem>(m_entities, m_events);
+	m_systems->add<PlayerSystem>(m_entities, m_events, controls);
 	m_systems->add<BehaviourSystem>(m_entities, m_events);
 	m_systems->add<MovementSystem>(m_entities, m_events);
 	m_systems->add<HealthSystem>(m_entities, m_events);

@@ -13,6 +13,7 @@ class Game {
 		void run();
 
 	private:
+		Json m_options;
 		City m_city;
 		std::shared_ptr<EntityRegistry> m_entities;
 		std::shared_ptr<EventDispatcher> m_events;
