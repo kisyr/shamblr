@@ -55,8 +55,8 @@ void Game::configure() {
 			c["key"],
 			c["button"],
 			c["action"]
-		}
-	);
+		});
+	}
 
 	m_systems->add<WorldSystem>(m_entities, m_events, m_city);
 	m_systems->add<SpriteSystem>(m_entities, m_events);

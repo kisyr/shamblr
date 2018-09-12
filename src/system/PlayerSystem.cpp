@@ -18,7 +18,7 @@ void PlayerSystem::process(const Time& time) {
 
 	entities()->view<component::Player, component::Physics, component::Health>().each(
 		[this, &window, &camera, &time](auto entity, auto& player, auto& physics, auto& health) {
-#if 1
+#if 0
 			const float rotationFactor = 3.0f * time.delta;
 			float rotation = 0.0f;
 			rotation += window->getKey('Z') * -rotationFactor;
@@ -38,19 +38,20 @@ void PlayerSystem::process(const Time& time) {
 			const auto movementFactor = 2.5f + (window->getKey(GLFW_KEY_LEFT_SHIFT) * 2.5f);
 			auto movement = glm::vec3(0.0f);
 			for (auto& c : m_controls) {
-				switch (true) {
-					case c.action == "moveUp":
-						movement.z += window->getKey(c.key.c_str().at(0)) * +movementFactor;
-						break;
-					case c.action == "moveDown":
-						movement.z += window->getKey(c.key.c_str().at(0)) * -movementFactor;
-						break;
-					case c.action == "moveLeft":
-						movement.x += window->getKey(c.key.c_str().at(0)) * +movementFactor;
-						break;
-					case c.action == "moveRight":
-						movement.x += window->getKey(c.key.c_str().at(0)) * -movementFactor;
-						break;
+				if (c.key.empty() || c.action.empty()) {
+					continue;
+				}
+				if (c.action == "moveUp") {
+					movement.z += window->getKey(toupper(c.key.at(0))) * +movementFactor;
+				}
+				if (c.action == "moveDown") {
+					movement.z += window->getKey(toupper(c.key.at(0))) * -movementFactor;
+				}
+				if (c.action == "moveLeft") {
+					movement.x += window->getKey(toupper(c.key.at(0))) * +movementFactor;
+				}
+				if (c.action == "moveRight") {
+					movement.x += window->getKey(toupper(c.key.at(0))) * -movementFactor;
 				}
 			}
 			physics.velocity += movement;

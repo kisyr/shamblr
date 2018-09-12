@@ -46,7 +46,7 @@ inline bool loadImage(const std::string& path, Image& image) {
 	memcpy(
 		image.pixels.data(),
 		pixels,
-		sizeof(GLubyte) * image.width * image.height * image.bpp
+		sizeof(unsigned char) * image.width * image.height * image.bpp
 	);
 	stbi_image_free(pixels);
 	return true;
